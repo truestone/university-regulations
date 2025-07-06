@@ -1,0 +1,351 @@
+<context>
+# Overview  
+The University Regulation Management and AI Search System is a comprehensive web-based platform designed to transform how university regulations are managed and accessed. Currently, Dongeui University's regulations exist as a massive 74,707-line unstructured text file, making it difficult for administrators to manage and for users to find relevant information.
+
+This system solves three critical problems:
+1. **Inefficient Regulation Management**: Administrators struggle to maintain and update regulations in text files, leading to errors and inconsistencies
+2. **Poor Information Accessibility**: Users cannot easily search for specific regulation information using natural language
+3. **Lack of Data Structure**: The current text-based format prevents automated processing and intelligent search capabilities
+
+The platform serves two primary user groups:
+- **Administrators**: University staff responsible for managing and updating regulations
+- **End Users**: Students, faculty, and staff who need to find specific regulation information
+
+The system provides immense value by digitizing and structuring regulation management, enabling natural language AI-powered search, and ensuring data consistency and accessibility.
+
+# Core Features  
+
+## 1. Regulation Management System
+**What it does**: Provides a web-based interface for administrators to create, read, update, and delete regulations with hierarchical structure management (Edition → Chapter → Regulation → Article → Clause).
+
+**Why it's important**: Eliminates error-prone manual text file editing and ensures data consistency across the regulation database.
+
+**How it works**: Uses a structured database model with proper relationships between regulation components, including support for attachments, regulation history, and status management (active/abolished).
+
+## 2. AI-Powered Natural Language Search
+**What it does**: Enables users to ask questions in natural language and receive relevant regulation information with proper citations and context.
+
+**Why it's important**: Makes regulation information accessible to non-experts who don't know specific regulation codes or legal terminology.
+
+**How it works**: Implements RAG (Retrieval-Augmented Generation) using vector embeddings of regulation articles, semantic search with pgvector, and AI response generation with proper source attribution.
+
+## 3. Data Transformation and Import System
+**What it does**: Converts the existing 74,707-line unstructured text file into a structured database with proper hierarchical relationships through a comprehensive 6-stage process.
+
+**Why it's important**: Enables the transition from legacy text-based regulation management to a modern, searchable database system. This is the most critical and complex component of the system.
+
+**How it works**: 
+- **Stage 1**: Text preprocessing and structure analysis with pattern recognition for editions, chapters, regulations, articles, and clauses
+- **Stage 2**: AI-based parsing using GPT-4/Claude with 95%+ accuracy target for content extraction and classification
+- **Stage 3**: JSON intermediate format generation with hierarchical data structure validation
+- **Stage 4**: Data validation and quality management with automated error detection and manual review interface
+- **Stage 5**: Database import with batch processing, relationship mapping, and duplicate prevention
+- **Stage 6**: Vector embedding generation with context enhancement and progress tracking
+
+**Critical Requirements:**
+- Handle complex Korean text processing with various numbering systems (제1조, ①, 가., etc.)
+- Process abolished regulations marked with 【폐지】 and maintain historical references
+- Manage mixed content types including regulation text, attachments, forms, and indices
+- Implement comprehensive error handling for parsing failures and data inconsistencies
+- Provide manual review interface for quality assurance and corrections
+
+## 4. Conversational Interface
+**What it does**: Provides a chat-like interface for users to interact with the AI system, maintaining conversation history and context.
+
+**Why it's important**: Creates an intuitive user experience similar to modern AI assistants, making regulation queries feel natural and accessible.
+
+**How it works**: Session-based conversations with message history, real-time responses using Hotwire Turbo, and automatic session management.
+
+## 5. RAG System Implementation
+**What it does**: Implements Retrieval-Augmented Generation for semantic search with vector embeddings and AI response generation.
+
+**Why it's important**: Provides accurate, contextual answers to natural language queries about regulations with proper source attribution.
+
+**How it works**:
+- **Vector Embeddings**: Generate 1536-dimension embeddings for each article using OpenAI text-embedding-3-small
+- **Semantic Search**: Use pgvector for cosine similarity search with configurable similarity thresholds
+- **Context Enhancement**: Include regulation hierarchy (edition/chapter/regulation) in embedding context
+- **Response Generation**: Use structured prompts with GPT-4/Claude for accurate, cited responses
+- **Caching Strategy**: Cache embeddings, search results (30min), and AI responses (12hrs) for performance
+
+## 6. Performance Optimization
+**What it does**: Ensures system responsiveness and scalability through database optimization and caching.
+
+**Why it's important**: Maintains sub-3-second response times for search queries and supports 50+ concurrent users.
+
+**How it works**:
+- **Database Indices**: Optimized pgvector indices for embedding search, GIN indices for text search
+- **Batch Processing**: Efficient embedding generation and database operations with configurable batch sizes
+- **Redis Caching**: Multi-layer caching for embeddings, search results, and regulation metadata
+- **Query Optimization**: Optimized joins and pagination for hierarchical regulation browsing
+
+# User Experience  
+
+## User Personas
+- **Regulation Administrator**: University staff member responsible for maintaining regulation accuracy and completeness
+- **Student**: Undergraduate or graduate student seeking information about academic policies, procedures, or requirements
+- **Faculty Member**: Professor or instructor looking for teaching-related regulations, research policies, or administrative procedures
+- **Staff Member**: University employee needing information about employment policies, procedures, or institutional regulations
+
+## Key User Flows
+
+### Administrator Flow
+1. Login with secure credentials
+2. Navigate to regulation management interface
+3. View hierarchical regulation structure
+4. Create/edit regulations with rich text editor
+5. Manage attachments and related documents
+6. Trigger embedding synchronization
+7. Monitor system performance and AI usage
+
+### End User Flow
+1. Access search interface (no login required)
+2. Enter natural language question
+3. Receive AI-generated response with source citations
+4. Follow links to full regulation text
+5. Continue conversation with follow-up questions
+6. Access conversation history within session
+
+## UI/UX Considerations
+- **Responsive Design**: Mobile-first approach supporting all device sizes
+- **Accessibility**: WCAG 2.1 AA compliance for inclusive access
+- **University Branding**: Integration of Dongeui University visual identity
+- **Performance**: Sub-3-second response times for search queries
+- **Intuitive Navigation**: Clear information hierarchy and search functionality
+</context>
+
+<PRD>
+# Technical Architecture  
+
+## System Components
+- **Web Framework**: Ruby on Rails 8.0.x with PostgreSQL and pgvector extension
+- **Frontend**: Rails Views with Tailwind CSS and Hotwire Turbo for real-time updates
+- **AI Integration**: Multi-provider support (OpenAI, Anthropic, Google) with local LLM options
+- **Caching Layer**: Redis for session management and search result caching
+- **Hosting**: Render platform with PostgreSQL database and automatic SSL
+
+## Data Models
+**Core Hierarchy Models:**
+- **User**: Admin authentication (email, password_digest, name, role, last_login_at)
+- **Edition**: 6 regulation volumes (number, title, description, sort_order, is_active)
+- **Chapter**: Regulation chapters (edition_id, number, title, description, sort_order, is_active)
+- **Regulation**: Individual regulations (chapter_id, code, title, status, abolished_at, enacted_at, department, sort_order)
+- **Article**: Regulation articles (regulation_id, number, title, content, embedding, embedding_updated_at, sort_order)
+- **Clause**: Article sub-items (article_id, type, number, content, sort_order)
+
+**Supporting Models:**
+- **Attachment**: Regulation appendices (regulation_id, type, number, title, content, file_path)
+- **RegulationHistory**: Change tracking (regulation_id, version, amendment_date, amendment_reason, amended_by)
+- **Conversation**: Chat sessions (session_id, title, created_at, expires_at, last_message_at, message_count)
+- **Message**: Chat messages (conversation_id, role, content, sources, processing_time, tokens_used, created_at)
+- **AiSetting**: AI configuration (provider, model_name, api_key_encrypted, monthly_budget, current_usage, is_active, environment)
+- **SystemLog**: Audit trail (action, user_id, target_type, target_id, details, ip_address, created_at)
+
+## APIs and Integrations
+- **AI Provider APIs**: OpenAI, Anthropic Claude, Google Gemini for embeddings and chat completion
+- **Vector Database**: pgvector for semantic search and similarity matching
+- **Authentication**: Rails built-in secure password system with session management
+- **File Storage**: Local file system for attachments with optional cloud storage integration
+
+## Infrastructure Requirements
+- **Database**: PostgreSQL 14+ with pgvector extension
+- **Memory**: Minimum 2GB RAM for embedding processing
+- **Storage**: 10GB for database, regulations, and attachments
+- **Network**: Reliable internet connection for AI API calls
+- **Security**: SSL/TLS encryption, secure API key management
+
+# Development Roadmap  
+
+## Phase 1: Foundation and Data Migration (MVP)
+**MVP Requirements:**
+- Basic Rails application structure with user authentication using has_secure_password
+- Complete database schema with all 12 core models and proper relationships
+- Comprehensive data import system implementing the full 6-stage transformation process:
+  - Text preprocessing with Korean language support and encoding detection
+  - AI-based parsing with pattern recognition for regulation hierarchy
+  - JSON intermediate format with validation and error handling
+  - Manual review interface for parsing corrections and quality assurance
+  - Batch database import with relationship mapping and duplicate prevention
+  - Progress tracking and rollback capabilities for failed imports
+- Basic web interface for viewing imported regulations with hierarchical navigation
+- Simple text-based search functionality (PostgreSQL full-text search, no AI yet)
+- Admin authentication and basic CRUD operations for regulation management
+
+**Deliverables:**
+- Working Rails 8.0.x application with PostgreSQL and pgvector setup
+- Successfully imported and validated regulation data from 74,707-line source file
+- All regulation hierarchy properly structured (Edition → Chapter → Regulation → Article → Clause)
+- Basic admin interface for regulation browsing and editing
+- Data validation system with error reporting and correction workflows
+- Simple search interface using PostgreSQL text search capabilities
+
+**Critical Success Criteria:**
+- 95%+ automated parsing accuracy for regulation structure
+- All 6 editions properly imported with correct hierarchical relationships
+- Zero data loss during transformation process
+- Manual review interface functional for remaining 5% parsing issues
+
+## Phase 2: AI Integration and Vector Search
+**Requirements:**
+- Vector embedding generation for all regulation articles with context enhancement
+- Multi-provider AI integration (OpenAI/Anthropic/Google) with fallback options
+- pgvector semantic search implementation with optimized indices
+- RAG system with retrieval and response generation pipeline
+- Conversational chat interface with session management
+- Embedding synchronization system for content updates
+
+**Deliverables:**
+- Functional semantic search with natural language queries
+- Complete vector embeddings for all regulation content (1536-dimension)
+- Chat interface with real-time responses using Hotwire Turbo
+- AI response generation with proper source citations and confidence scoring
+- Conversation management with 7-day session expiration
+- Admin interface for AI settings and embedding synchronization
+
+**Performance Targets:**
+- Sub-3-second response times for search queries
+- 90%+ search relevance accuracy
+- Support for 10+ concurrent conversations
+
+## Phase 3: Advanced Features and Production Optimization
+**Requirements:**
+- Advanced conversation management with persistent history and context
+- Comprehensive admin dashboard with system monitoring and usage analytics
+- Regulation status management (active/abolished/superseded) with historical tracking
+- Performance optimization with multi-layer caching (Redis) and database query optimization
+- Enhanced UI/UX with Dongeui University branding and responsive design
+- Advanced search features with filtering, sorting, and regulation hierarchy navigation
+- API usage monitoring and budget management with alerts
+
+**Deliverables:**
+- Complete admin interface for regulation lifecycle management
+- Advanced search with filters (edition, chapter, status, date range)
+- Performance-optimized system with caching layers and optimized database indices
+- Professional UI matching university branding with accessibility compliance
+- Comprehensive system monitoring dashboard with usage metrics and performance analytics
+- API cost tracking and budget management system with automated alerts
+
+## Phase 4: Production Readiness and Security Hardening
+**Requirements:**
+- Production deployment configuration on Render with SSL/TLS encryption
+- Comprehensive security audit and penetration testing
+- Performance monitoring and alerting with error tracking
+- User documentation, training materials, and system administration guides
+- Backup and disaster recovery procedures with automated testing
+- Security hardening including API key encryption, audit logging, and access controls
+- Load testing and capacity planning for 50+ concurrent users
+
+**Deliverables:**
+- Production-ready deployment on Render with automated CI/CD pipeline
+- Complete security audit report and remediation of identified vulnerabilities
+- Performance monitoring dashboard with real-time alerts and error tracking
+- Comprehensive user guides, admin documentation, and training materials
+- Tested backup and recovery procedures with documented RTO/RPO targets
+- Security compliance report with Rails built-in protections and custom security measures
+
+# Logical Dependency Chain
+
+## Foundation First (Phase 1)
+1. **Database Schema**: Must be established before any data processing - includes all 12 models with proper relationships
+2. **Data Models**: Core Rails models define the regulation hierarchy and establish data integrity constraints
+3. **Text Processing**: Convert 74,707-line unstructured text to structured data using 6-stage transformation
+4. **Data Validation**: Ensure 95%+ parsing accuracy and data integrity before building dependent features
+5. **Basic Web Interface**: Provide immediate visibility into imported data for validation and early feedback
+
+## Quick to Usable Frontend (Phase 2)
+1. **Simple Search**: PostgreSQL text-based search provides immediate value while AI components are developed
+2. **AI Integration**: Add semantic search capabilities incrementally with vector embeddings
+3. **Chat Interface**: Build conversational experience on top of proven search functionality
+4. **Response Generation**: Enhance search results with AI-generated answers and proper citations
+5. **Basic Conversation**: Enable follow-up questions and context maintenance within sessions
+
+## Atomic Feature Development Strategy
+Each feature must be independently functional while building toward the complete system:
+- **Search without AI**: Text-based search provides core functionality immediately
+- **AI without Conversation**: Semantic search valuable before conversational features
+- **Conversation without History**: Single-turn interactions establish AI integration before session management
+- **Administration without Monitoring**: Core CRUD operations before advanced analytics and monitoring
+- **Local Development without Cloud**: System works with local LLMs before cloud AI dependencies
+
+## Incremental Improvement and Risk Mitigation
+1. **MVP Focus**: Prioritize data import and basic search to prove core value proposition
+2. **AI Enhancement**: Add semantic capabilities to existing proven search foundation
+3. **User Experience Polish**: Improve UI/UX and add advanced features based on user feedback
+4. **Production Scale**: Optimize for performance, security, and multi-user production use
+
+**Critical Dependencies:**
+- Database schema must be complete before data import
+- Data import must achieve 95%+ accuracy before AI integration
+- Basic search must be functional before adding AI complexity
+- AI integration must be stable before adding conversation features
+- Core features must be solid before performance optimization
+
+# Risks and Mitigations  
+
+## Technical Challenges
+**Risk**: Complex data parsing from 74,707-line unstructured Korean text file with inconsistent formatting
+**Mitigation**: Implement staged parsing with AI assistance (GPT-4/Claude), comprehensive manual validation interface, automated error detection, and complete rollback capabilities for failed imports
+
+**Risk**: AI API rate limits and costs exceeding monthly budget constraints
+**Mitigation**: Implement multi-layer caching strategies, efficient batch processing, real-time usage monitoring with alerts, and fallback to local LLM options (Ollama, LM Studio, GPT4All)
+
+**Risk**: Vector search performance degradation with large regulation dataset
+**Mitigation**: Optimize pgvector indices configuration, implement result caching with Redis, use appropriate similarity thresholds, and monitor query performance metrics
+
+**Risk**: Korean text processing complexity with various numbering systems and special characters
+**Mitigation**: Develop specialized Korean text processing functions, implement comprehensive pattern recognition for regulation structures, and establish manual review workflows for edge cases
+
+## MVP Scope Definition and Feature Management
+**Risk**: Feature creep preventing timely MVP delivery and project scope expansion
+**Mitigation**: Strictly focus on core data import and basic search functionality for MVP, defer all advanced features to subsequent phases, establish clear acceptance criteria for each phase
+
+**Risk**: Perfectionism in data parsing accuracy causing development delays
+**Mitigation**: Accept 95% automated parsing accuracy target, implement efficient manual review interface for remaining 5%, establish clear quality thresholds and move-forward criteria
+
+**Risk**: Over-engineering the AI integration before proving core value
+**Mitigation**: Start with simple prompt-based responses, iterate based on actual user feedback, implement progressive enhancement approach to AI features
+
+**Risk**: Insufficient testing with real regulation data leading to production issues
+**Mitigation**: Use actual university regulation file throughout development, involve domain experts in validation, implement comprehensive integration testing with real data
+
+## Resource Constraints and Budget Management
+**Risk**: Limited development time and budget affecting project completion
+**Mitigation**: Prioritize features by user impact and technical risk, use proven technologies (Rails, PostgreSQL), leverage existing libraries and frameworks, implement agile development practices
+
+**Risk**: AI API costs exceeding allocated budget during development and operation
+**Mitigation**: Implement real-time usage monitoring with automatic spending limits, provide local LLM fallback options, optimize API usage through caching and batch processing
+
+**Risk**: Inadequate server resources on Render free tier affecting performance
+**Mitigation**: Optimize application performance early, implement efficient caching strategies, plan for upgrade to paid tiers based on usage metrics, monitor resource consumption continuously
+
+**Risk**: Single point of failure in AI provider dependencies
+**Mitigation**: Implement multi-provider support (OpenAI, Anthropic, Google), provide local LLM fallback options, design provider abstraction layer for easy switching
+
+# Appendix  
+
+## Research Findings
+- **Data Analysis**: 74,707-line file contains 6 editions with complex hierarchical structure, mixed content types (regulations, attachments, forms, indices), and various formatting inconsistencies requiring specialized parsing
+- **User Research**: Primary need is natural language search for regulation information, with secondary needs for regulation management and maintenance workflows
+- **Technical Research**: pgvector provides excellent performance for semantic search at university regulation scale, with efficient cosine similarity operations and proper indexing
+- **AI Provider Analysis**: OpenAI offers best balance of cost and performance for embeddings (text-embedding-3-small) and chat completion (GPT-4), with Anthropic Claude as strong alternative
+
+## Technical Specifications
+- **Text Processing**: Support for Korean language regulation text with EUC-KR/UTF-8 encoding detection, specialized pattern recognition for Korean numbering systems (제1조, ①, 가.), and proper handling of special characters
+- **Database**: PostgreSQL 14+ with pgvector extension for vector operations, optimized with specific indices for regulation hierarchy and full-text search
+- **AI Models**: text-embedding-3-small (1536-dimension) for embeddings, GPT-4 or Claude-3 for response generation with temperature=0.1 for consistency
+- **Performance**: Target 3-5 second response times for search queries, support for 50 concurrent users with current architecture, 20-minute maximum for full embedding synchronization
+- **Scalability**: Designed for single university initially, with architecture supporting multi-university expansion
+
+## Implementation Details
+- **Parsing Strategy**: 6-stage process from text preprocessing to embedding generation with comprehensive error handling and manual review capabilities
+- **Quality Metrics**: 95% automated parsing accuracy target, 90% search relevance accuracy, 99% system availability with monitoring
+- **Security**: Rails built-in security features (CSRF protection, SQL injection prevention), encrypted API key storage using Rails credentials, comprehensive audit logging for all admin actions
+- **Monitoring**: Real-time usage tracking with Render platform monitoring, performance metrics collection, automated error alerting via email
+
+## Future Enhancements and Roadmap
+- **Multi-university Support**: Extend system architecture to handle multiple university regulation sets with tenant isolation and shared infrastructure
+- **Mobile Application**: Native mobile apps built on Rails API with offline regulation browsing and synchronized search history
+- **Advanced Analytics**: Usage pattern analysis, popular query identification, content gap analysis, and user behavior insights
+- **System Integration**: Connect with existing university systems (LMS, student portal, HR systems) for seamless regulation access within existing workflows
+- **Advanced AI Features**: Regulation comparison tools, automated compliance checking, change impact analysis, and intelligent regulation drafting assistance
+</PRD>
