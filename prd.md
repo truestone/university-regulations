@@ -26,9 +26,10 @@
 - **Database**: PostgreSQL with pgvector extension
 - **Frontend**: Rails Views + Tailwind CSS + Hotwire (Turbo)
 - **AI Integration**: 
-  - 로컬 개발: OpenAI API, Anthropic Claude API, Google Gemini API, 또는 로컬 LLM (Ollama, LM Studio, GPT4All 등)
+  - 로컬 개발: OpenAI API, Anthropic Claude API, Google Gemini API (로컬 LLM은 호환성 문제로 권장하지 않음)
   - 배포 환경: OpenAI API, Anthropic Claude API, 또는 Google Gemini API
 - **Deployment**: Render (무료 호스팅)
+- **개발 환경**: Docker 기반 개발 환경 (macOS 호스트, Linux 컨테이너)
 
 ### 2.2. 필수 Gem 목록
 
@@ -500,14 +501,215 @@ end
 
 ## 8. 배포 및 운영
 
-### 8.1. 배포 환경
+### 8.1. 개발 및 배포 환경
+
+- **로컬 개발환경**: macOS (Docker 기반)
+- **배포환경**: Linux (Render.com)
+- **환경 차이 고려사항**: 
+  - **macOS에 직접 설치 금지**: pgvector, PostgreSQL 등 OS 종속적 라이브러리를 macOS에 직접 설치하지 않음
+  - **Docker 필수 사용**: 모든 개발 작업은 Docker 컨테이너 내에서 수행
+  - **환경 일관성**: 개발/테스트/배포 환경을 모두 Linux 컨테이너로 통일
+  - **네이티브 확장 모듈**: pgvector 등은 Docker 컨테이너 내에서만 설치 및 테스트
+  - **호환성 보장**: 배포 환경과 100% 동일한 조건에서 개발 및 테스트
+
+#### 8.1.1. Docker 개발 환경 설정
+
+```dockerfile
+# Dockerfile.dev
+FROM ruby:3.3-slim-bullseye
+
+# 필수 패키지 및 PostgreSQL 클라이언트 설치
+RUN apt-get update -qq && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    postgresql-client \
+    git \
+    nodejs \
+    npm
+
+WORKDIR /app
+
+# Gemfile 복사 및 번들 설치
+COPY Gemfile* ./
+RUN bundle install
+
+# 앱 파일 복사
+COPY . .
+
+# 개발 서버 실행
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]
+```
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  db:
+    image: ankane/pgvector:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+  
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/regulations_development
+      REDIS_URL: redis://redis:6379/1
+
+volumes:
+  postgres_data:
+```
+
+### 8.2. 개발 환경 구성 원칙
+
+**macOS 개발 환경 구성 원칙:**
+
+1. **Docker Desktop만 설치**: macOS에는 Docker Desktop 외에 다른 개발 도구 설치 금지
+2. **완전한 컨테이너 기반 개발**: 모든 개발, 테스트, 빌드 작업은 Docker 컨테이너 내에서 수행
+3. **호스트 OS 격리**: macOS 호스트 시스템에는 개발 관련 라이브러리/도구 설치하지 않음
+4. **배포 환경 일치**: 개발 환경과 배포 환경을 100% 동일하게 유지
+
+**설치 금지 목록 (macOS 직접 설치 금지):**
+- Ruby (rbenv, rvm 등)
+- Rails 
+- PostgreSQL
+- Redis
+- Node.js (프로젝트 내 필요한 경우)
+- pgvector
+- 기타 개발 관련 라이브러리
+
+**허용 목록 (macOS 설치 허용):**
+- Docker Desktop
+- VS Code 또는 기타 에디터
+- Git
+- 터미널 앱
+
+**개발 워크플로우:**
+```bash
+# 프로젝트 시작
+docker-compose up -d
+
+# Rails 서버 접속
+docker-compose exec web bash
+
+# 컨테이너 내에서 모든 Rails 명령 실행
+docker-compose exec web rails console
+docker-compose exec web rails db:migrate
+docker-compose exec web bundle install
+```
+
+이 접근 방식을 통해 macOS 개발 환경과 Linux 배포 환경 간의 차이로 인한 모든 문제를 원천적으로 방지할 수 있습니다.
+
+### 8.3. 호스팅 환경
 
 - **호스팅**: Render 무료 티어 활용
 - **데이터베이스**: PostgreSQL with pgvector
 - **예상 비용**: 월 $2-5 (AI API 사용량)
 - **Cold Start 방지**: 정기적인 ping으로 서비스 활성 상태 유지
 
-### 8.2. 운영 관리
+### 8.4. 크로스 플랫폼 개발 고려사항
+
+#### 8.4.1. macOS와 Linux 환경 차이점
+
+macOS에서 개발하고 Linux에 배포할 때 발생할 수 있는 주요 이슈:
+
+- **네이티브 확장 모듈**: pgvector 같은 네이티브 확장은 OS별로 설치 방법과 바이너리가 다름
+- **성능 특성**: 동일 코드도 OS별로 성능 특성이 달라질 수 있음
+- **파일 시스템**: 대소문자 구분 차이 (macOS는 기본적으로 대소문자 구분 없음)
+- **시스템 명령어**: 쉘 스크립트 및 시스템 명령어 차이
+- **환경 변수**: 기본 환경 변수 및 설정 차이
+
+#### 8.4.2. Docker 기반 개발 환경의 이점
+
+**macOS에서 직접 설치의 문제점:**
+- **호환성 이슈**: macOS에 설치된 라이브러리는 Linux 배포 환경과 다름
+- **의존성 충돌**: macOS 버전의 PostgreSQL, Redis 등이 배포 환경과 버전 차이 발생
+- **테스트 신뢰성**: 개발 환경에서 정상 작동해도 배포 환경에서 실패할 수 있음
+- **팀 협업 어려움**: 각 개발자의 macOS 환경이 다르면 재현 불가능한 문제 발생
+
+**Docker 기반 개발 환경의 이점:**
+- **macOS에는 Docker Desktop만 설치**: 다른 개발 도구는 일체 설치하지 않음
+- **모든 작업은 컨테이너 내부**: Rails, PostgreSQL, Redis 등 모든 개발 도구는 컨테이너에서 실행
+- **환경 일관성**: 개발/테스트/배포 모두 동일한 Linux 환경 사용
+- **의존성 격리**: OS 종속적 라이브러리를 컨테이너 내부에 완전히 격리
+- **팀 협업**: 모든 개발자가 동일한 환경에서 작업 가능
+- **빠른 설정**: 새 개발자는 `docker-compose up`만으로 환경 구성 완료
+- **테스트 신뢰성**: 배포 환경과 100% 동일한 조건에서 테스트 가능
+
+#### 8.4.3. pgvector 관련 특별 고려사항
+
+**macOS에서 pgvector 직접 설치 시 문제점:**
+- **컴파일 오류**: macOS에서 pgvector 컴파일 시 의존성 문제 발생
+- **버전 호환성**: macOS PostgreSQL과 Linux PostgreSQL의 바이너리 호환성 문제
+- **성능 차이**: 동일 코드도 macOS와 Linux에서 성능 특성이 다름
+- **테스트 신뢰성**: 개발 환경과 배포 환경의 차이로 인한 예상치 못한 오류
+
+**Docker 기반 pgvector 사용 전략:**
+- **ankane/pgvector 이미지 사용**: 사전 컴파일된 안정된 이미지 활용
+- **개발 및 배포 환경 통일**: 동일한 pgvector 버전과 설정 사용
+- **macOS에는 설치하지 않음**: PostgreSQL, pgvector를 macOS에 직접 설치하지 않음
+- **벡터 인덱스 최적화**: 실제 배포 환경과 동일한 조건에서 성능 튜닝
+
+#### 8.4.4. pgvector와 벡터 인덱스 최적화
+
+벡터 인덱스 설정을 위한 마이그레이션 예시:
+
+```ruby
+class AddVectorIndexes < ActiveRecord::Migration[8.0]
+  def change
+    # Docker 환경에서만 벡터 인덱스 추가
+    # macOS 네이티브 환경에서는 pgvector 호환성 문제가 있을 수 있음
+    if ENV['DOCKER_ENV'] == 'true'
+      add_index :articles, :embedding, using: :ivfflat, opclass: :vector_cosine_ops
+    else
+      # 개발 환경에서는 인덱스 생성 건너뛰기
+      puts "WARNING: 벡터 인덱스가 추가되지 않았습니다. Docker 환경에서 실행하세요."
+      # 프로덕션 환경에서는 실패하도록 설정
+      raise "Error: 벡터 인덱스는 Docker 환경에서만 추가할 수 있습니다." if Rails.env.production?
+    end
+  end
+end
+```
+
+**pgvector 구성 전략:**
+
+1. **로컬 개발**:
+   - Docker 컨테이너에서 ankane/pgvector 이미지 사용
+   - **macOS에는 PostgreSQL/pgvector 설치 금지**
+   - 모든 데이터베이스 작업은 컨테이너 내에서 실행
+
+2. **테스트 환경**:
+   - CI/CD 파이프라인에서 Docker 컨테이너로 테스트
+   - 벡터 검색 기능에 대한 별도 테스트 스위트 구성
+
+3. **배포 환경**:
+   - Render.com의 PostgreSQL 인스턴스에 pgvector 확장 활성화
+   - pgvector 버전 호환성 확인 (API 변경 가능성 고려)
+
+4. **성능 최적화**:
+   - 인덱스 구성 파라미터 조정 (lists, probes)
+   - 인덱스 생성 배치 처리로 부하 분산
+   - 대량 벡터 삽입 시 인덱스 재생성 전략
+
+### 8.5. 운영 관리
 
 - **백업**: 호스팅 플랫폼 자동 백업
 - **모니터링**: 기본 로그 및 메트릭 확인
