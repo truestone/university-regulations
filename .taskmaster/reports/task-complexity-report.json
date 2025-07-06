@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-07-06T03:42:02.549Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "로컬 개발 환경 구축 (Rails 8 + PostgreSQL + pgvector)",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Homebrew/apt 패키지 설치, Rails 프로젝트 초기화, pgvector 확장, Procfile 및 .env 설정, 환경 검증 스크립트, README 문서 작성을 각각 별도 서브태스크로 나누어 세부 작업·완료 기준·의존성을 정의하십시오.",
+			"reasoning": "단일 머신에서 이루어지는 환경 설정이며 외부 API나 복잡한 비즈니스 로직이 없어서 중간 난이도지만, 도구 종류가 많아 6단계 분할이 적절합니다."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "데이터베이스 스키마 및 모델 정의",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "모델 목록 확정, 마이그레이션 작성, 관계·인덱스 추가, enum/validation 구현, seed 데이터 작성, RSpec 모델 테스트 작성을 각각 서브태스크로 세분화하십시오.",
+			"reasoning": "12개 모델과 관계, 제약, 테스트까지 포함되어 구조적 복잡도가 있으므로 여섯 개 정도의 논리적 단계로 나누는 것이 효율적입니다."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "기본 인증 및 관리자 UI 뼈대 구축",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "세션 컨트롤러, User 모델 해시·seed, Tailwind 레이아웃, /admin scaffold, 권한 관리, Turbo Frame 통합, 통합 테스트로 7개 서브태스크를 정의하고 의존성을 명시하십시오.",
+			"reasoning": "UI·인증·권한·테스트까지 아우르며 프론트와 백이 교차되므로 중상 난이도이고 이미 7단계 구성이 알맞습니다."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "규정 원본 파일 업로드 및 인코딩 자동 감지",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "ActiveStorage 설정, 업로드 폼, 파일명 검증, 인코딩 감지, 스트리밍 저장, Sidekiq 연동, 오류 처리, 통합·부하 테스트의 8단계를 서브태스크로 상세화하십시오.",
+			"reasoning": "대용량 파일 처리와 인코딩 변환, 백그라운드 작업이 포함되어 리스크가 높아 8단계 분할이 필요합니다."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "1·2단계: 전처리 및 AI 기반 파싱 파이프라인",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "텍스트 정규화, 섹션 경계 판정, 배치 분할, 프롬프트 템플릿, AI 클라이언트 래퍼, JSON 파싱, 중간 저장, 로깅·모니터링, 테스트 시나리오 등 9개 서브태스크로 세분화하십시오.",
+			"reasoning": "LLM 호출·토큰 관리·재시도 등 비동기 로직이 복잡하고 성능 요구도 높아 고난도이며 9단계가 적절합니다."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "3·4단계: JSON 중간형식 검증 및 수동 검수 UI",
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "IntermediateRecord 모델, JSON Schema, 서버 사이드 검증, 오류 diff, 프런트 컴포넌트, 승인/반려 플로우, 배치 검증, E2E 테스트의 8단계를 서브태스크로 명확히 작성하십시오.",
+			"reasoning": "백엔드 검증과 프런트 UI가 결합되어 중상 난이도이며 8단계가 관리 가능 범위입니다."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "5단계: 일괄 DB Import & 관계 매핑",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "트랜잭션 서비스, 멱등성 전략, 배치 insert_all, 무결성 검증, 롤백 처리, 벤치마크·인덱스 튜닝, 통합 테스트의 7개 서브태스크를 정의하십시오.",
+			"reasoning": "대량 데이터 처리와 롤백, 성능 튜닝이 필요해 고난이도이며 7단계로 세분화하면 책임이 명확해집니다."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "규정 조회 UI 및 PostgreSQL 전체 텍스트 검색",
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Public 컨트롤러, Bread-Crumb UI, pg_search 인덱스, 하이라이트 로직, Hotwire 무한 스크롤, 페이지네이션 튜닝, 모바일 스타일링, 부하 테스트의 8단계 서브태스크를 상세화하십시오.",
+			"reasoning": "검색 성능·UI·모바일 대응까지 포함되어 중상 난이도이며 8단계로 나누어야 병목을 줄일 수 있습니다."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "임베딩 생성 및 pgvector 유사도 검색",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Article 스코프 설정, OpenAI API 래퍼, embedding 업데이트, pgvector 인덱스 튜닝, 검색 API, Redis 캐싱, 모니터링 대시보드, 장애 주입 테스트 8단계를 서브태스크로 정의하십시오.",
+			"reasoning": "외부 API·벡터 인덱스·캐싱·모니터링 등 다양한 컴포넌트가 얽혀 고난이도이며 8단계 분할이 적합합니다."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "RAG 기반 대화형 챗 인터페이스",
+			"complexityScore": 8,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Conversation/Message 스키마, 세션 관리, VectorSearch, RAG 프롬프트, GPT-4 래퍼, Turbo Stream 방송, 인용 렌더링, 캐싱 전략, WebSocket 부하 테스트, 개인정보 익명화의 10단계 서브태스크를 작성하십시오.",
+			"reasoning": "실시간 스트리밍, RAG, 스케일링, 개인정보 보호까지 요구되어 복잡성이 매우 높아 10단계 세분화가 필요합니다."
+		}
+	]
+}
