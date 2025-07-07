@@ -27,3 +27,7 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/ 
+# Rails tmp 폴더 추가
+tmp/
+/tmp/*
+!tmp/.keep
