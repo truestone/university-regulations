@@ -1,0 +1,76 @@
+# Rails 8 + PostgreSQL + Redis + pgvector 통합 환경
+FROM ruby:3.3-alpine
+
+# 시스템 패키지 및 PostgreSQL, Redis 설치
+RUN apk add --no-cache \
+    build-base \
+    git \
+    postgresql \
+    postgresql-dev \
+    postgresql-client \
+    postgresql-contrib \
+    redis \
+    nodejs \
+    npm \
+    yarn \
+    tzdata \
+    yaml-dev \
+    curl \
+    supervisor \
+    su-exec \
+    && rm -rf /var/cache/apk/*
+
+# pgvector 확장 설치
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    make \
+    musl-dev \
+    postgresql-dev \
+    && git clone https://github.com/pgvector/pgvector.git /tmp/pgvector \
+    && cd /tmp/pgvector \
+    && make \
+    && make install \
+    && cd / \
+    && rm -rf /tmp/pgvector \
+    && apk del .build-deps
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# Ruby 최신 버전의 Bundler 설치
+RUN gem install bundler
+
+# PostgreSQL 데이터 디렉토리 생성 및 초기화
+RUN mkdir -p /var/lib/postgresql/data /run/postgresql \
+    && chown -R postgres:postgres /var/lib/postgresql /run/postgresql \
+    && su-exec postgres initdb -D /var/lib/postgresql/data \
+    && echo "host all all 0.0.0.0/0 trust" >> /var/lib/postgresql/data/pg_hba.conf \
+    && echo "listen_addresses = '*'" >> /var/lib/postgresql/data/postgresql.conf
+
+# 애플리케이션 코드 복사
+COPY . .
+
+# Rails 프로젝트 초기화 실행
+RUN chmod +x init_rails.sh && ./init_rails.sh
+
+# Supervisor 설정 파일 생성 및 로그 디렉토리 생성
+RUN mkdir -p /etc/supervisor/conf.d /var/log/supervisor
+COPY supervisord.conf /etc/supervisord.conf
+
+# 환경변수 설정
+ENV RAILS_ENV=development
+ENV BUNDLE_PATH=/bundle
+ENV BUNDLE_BIN=/bundle/bin
+ENV PATH=$BUNDLE_BIN:$PATH
+ENV DATABASE_URL=postgresql://postgres:password@localhost:5432/regulations_development
+ENV REDIS_URL=redis://localhost:6379/0
+
+# 포트 노출
+EXPOSE 3000 5432 6379
+
+# 헬스체크 추가
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3000/ || exit 1
+
+# Supervisor로 모든 서비스 시작
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

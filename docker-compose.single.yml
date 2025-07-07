@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.all-in-one
+    ports:
+      - "3000:3000"
+      - "5432:5432"
+      - "6379:6379"
+    volumes:
+      - .:/app
+      - postgres_data:/var/lib/postgresql/data
+      - redis_data:/var/lib/redis
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://postgres:password@localhost:5432/regulations_development
+      REDIS_URL: redis://localhost:6379/0
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+  redis_data:

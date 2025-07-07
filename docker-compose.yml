@@ -32,7 +32,7 @@ services:
 
   web:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails server -b 0.0.0.0"
+    command: sh -c "rm -f tmp/pids/server.pid && bundle install && rails server -b 0.0.0.0"
     volumes:
       - .:/app
       - bundle_data:/bundle
@@ -47,6 +47,12 @@ services:
       DATABASE_URL: postgres://postgres:password@db:5432/regulations_development
       REDIS_URL: redis://redis:6379/0
       DOCKER_ENV: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     stdin_open: true
     tty: true
 
