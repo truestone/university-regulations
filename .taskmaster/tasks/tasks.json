@@ -97,8 +97,8 @@
             "description": "도메인 요구사항에 맞춰 모든 ActiveRecord 모델과 대응되는 마이그레이션 파일을 작성한다.",
             "dependencies": [],
             "details": "• ERD 검토 후 rails g model 명령으로 모델 생성\n• 필수 컬럼, 기본값, 제약조건(UNIQUE, NOT NULL) 포함\n• 마이그레이션 실행 및 스키마 확인\n• 롤백/재실행 스크립트 준비",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ 9개 핵심 모델 생성 완료 (User, Edition, Chapter, Regulation, Article, Clause, Conversation, Message, AiSetting)\n✅ 11개 마이그레이션 파일 생성 및 실행 완료\n✅ pgvector 확장 활성화\n✅ 외래키 제약조건 및 인덱스 설정\n✅ 모델 Association 및 Validation 구현\n✅ 데이터베이스 스키마 생성 완료"
           },
           {
             "id": 2,

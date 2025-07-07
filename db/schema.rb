@@ -10,8 +10,137 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 0) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_07_041008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "vector"
 
+  create_table "ai_settings", force: :cascade do |t|
+    t.string "provider", null: false
+    t.string "api_key"
+    t.string "model_id", null: false
+    t.decimal "monthly_budget", precision: 10, scale: 2, default: "0.0"
+    t.decimal "usage_this_month", precision: 10, scale: 2, default: "0.0"
+    t.boolean "is_active", default: false, null: false
+    t.datetime "last_used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_ai_settings_on_is_active"
+    t.index ["provider", "model_id"], name: "index_ai_settings_on_provider_and_model_id", unique: true
+    t.index ["provider"], name: "index_ai_settings_on_provider"
+  end
+
+  create_table "articles", force: :cascade do |t|
+    t.bigint "regulation_id", null: false
+    t.integer "number"
+    t.string "title"
+    t.text "content"
+    t.integer "sort_order"
+    t.boolean "is_active", default: true
+    t.text "embedding"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["regulation_id", "sort_order"], name: "index_articles_on_regulation_id_and_sort_order"
+    t.index ["regulation_id"], name: "index_articles_on_regulation_id"
+  end
+
+  create_table "chapters", force: :cascade do |t|
+    t.bigint "edition_id", null: false
+    t.integer "number", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.integer "sort_order", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["edition_id", "number"], name: "index_chapters_on_edition_id_and_number", unique: true
+    t.index ["edition_id", "sort_order"], name: "index_chapters_on_edition_id_and_sort_order"
+    t.index ["edition_id"], name: "index_chapters_on_edition_id"
+  end
+
+  create_table "clauses", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.integer "number", null: false
+    t.text "content", null: false
+    t.string "clause_type", default: "paragraph"
+    t.integer "sort_order", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id", "number"], name: "index_clauses_on_article_id_and_number", unique: true
+    t.index ["article_id", "sort_order"], name: "index_clauses_on_article_id_and_sort_order"
+    t.index ["article_id"], name: "index_clauses_on_article_id"
+    t.index ["clause_type"], name: "index_clauses_on_clause_type"
+  end
+
+  create_table "conversations", force: :cascade do |t|
+    t.string "session_id", null: false
+    t.string "title"
+    t.datetime "last_message_at"
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_conversations_on_expires_at"
+    t.index ["last_message_at"], name: "index_conversations_on_last_message_at"
+    t.index ["session_id"], name: "index_conversations_on_session_id", unique: true
+  end
+
+  create_table "editions", force: :cascade do |t|
+    t.integer "number", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.integer "sort_order", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["number"], name: "index_editions_on_number", unique: true
+    t.index ["sort_order"], name: "index_editions_on_sort_order"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.string "role", null: false
+    t.text "content", null: false
+    t.integer "tokens_used", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["role"], name: "index_messages_on_role"
+  end
+
+  create_table "regulations", force: :cascade do |t|
+    t.bigint "chapter_id", null: false
+    t.integer "number", null: false
+    t.string "title", null: false
+    t.text "content"
+    t.string "regulation_code", null: false
+    t.string "status", default: "active"
+    t.integer "sort_order", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chapter_id", "number"], name: "index_regulations_on_chapter_id_and_number", unique: true
+    t.index ["chapter_id", "sort_order"], name: "index_regulations_on_chapter_id_and_sort_order"
+    t.index ["chapter_id"], name: "index_regulations_on_chapter_id"
+    t.index ["regulation_code"], name: "index_regulations_on_regulation_code", unique: true
+    t.index ["status"], name: "index_regulations_on_status"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email"
+    t.string "password_digest"
+    t.string "name"
+    t.string "role"
+    t.datetime "last_login_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "articles", "regulations"
+  add_foreign_key "chapters", "editions"
+  add_foreign_key "clauses", "articles"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "regulations", "chapters"
 end
