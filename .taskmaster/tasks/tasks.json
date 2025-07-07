@@ -119,8 +119,8 @@
               1
             ],
             "details": "• belongs_to, has_many, has_one, through 등 관계 설정\n• dependent 옵션으로 연쇄 삭제 규칙 정의\n• presence, uniqueness, numericality 등 유효성 검증 추가\n• 커스텀 validator 작성 및 spec 초안 마련",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ 모든 모델 Association 관계 설정 완료 (belongs_to, has_many, through)\n✅ Dependent destroy 규칙 구현 (계층적 연쇄 삭제)\n✅ 기본 Validation 규칙 구현 (presence, uniqueness, inclusion, numericality)\n✅ 커스텀 Validator 2개 작성 (RegulationCodeValidator, EmbeddingValidator)\n✅ 비즈니스 로직 Validation 추가 (만료일 검증, API 키 검증, 예산 초과 검증)\n✅ RSpec 모델 테스트 스펙 3개 작성 (User, Regulation, AiSetting)\n✅ 모든 Validation 규칙 정상 작동 확인"
           },
           {
             "id": 4,

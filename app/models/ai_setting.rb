@@ -4,6 +4,8 @@ class AiSetting < ApplicationRecord
   validates :monthly_budget, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :usage_this_month, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :provider, uniqueness: { scope: :model_id }
+  validate :api_key_present_when_active
+  validate :usage_not_exceed_budget
   
   scope :active, -> { where(is_active: true) }
   scope :by_provider, ->(provider) { where(provider: provider) }
@@ -24,5 +26,19 @@ class AiSetting < ApplicationRecord
   
   def can_use?
     is_active? && !budget_exceeded? && api_key.present?
+  end
+  
+  private
+  
+  def api_key_present_when_active
+    if is_active? && api_key.blank?
+      errors.add(:api_key, 'must be present when setting is active')
+    end
+  end
+  
+  def usage_not_exceed_budget
+    if usage_this_month > monthly_budget
+      errors.add(:usage_this_month, 'cannot exceed monthly budget')
+    end
   end
 end

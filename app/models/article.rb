@@ -8,6 +8,7 @@ class Article < ApplicationRecord
   validates :sort_order, presence: true
   validates :number, uniqueness: { scope: :regulation_id }
   validates :sort_order, uniqueness: { scope: :regulation_id }
+  validates :embedding, embedding: { dimensions: 1536, allow_blank: true }
   
   scope :active, -> { where(is_active: true) }
   scope :ordered, -> { order(:sort_order) }

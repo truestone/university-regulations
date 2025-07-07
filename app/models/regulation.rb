@@ -5,7 +5,7 @@ class Regulation < ApplicationRecord
   
   validates :number, presence: true
   validates :title, presence: true
-  validates :regulation_code, presence: true, uniqueness: true
+  validates :regulation_code, presence: true, uniqueness: true, regulation_code: true
   validates :status, presence: true, inclusion: { in: %w[active inactive abolished] }
   validates :sort_order, presence: true
   validates :number, uniqueness: { scope: :chapter_id }

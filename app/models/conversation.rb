@@ -3,6 +3,7 @@ class Conversation < ApplicationRecord
   
   validates :session_id, presence: true, uniqueness: true
   validates :expires_at, presence: true
+  validate :expires_at_must_be_future
   
   scope :active, -> { where('expires_at > ?', Time.current) }
   scope :expired, -> { where('expires_at <= ?', Time.current) }
@@ -27,5 +28,18 @@ class Conversation < ApplicationRecord
   
   def update_last_message_at
     self.last_message_at = Time.current if messages.any?
+  end
+  
+  def expires_at_must_be_future
+    return unless expires_at.present?
+    
+    if expires_at <= Time.current
+      errors.add(:expires_at, 'must be in the future')
+    end
+    
+    # Maximum expiration is 30 days
+    if expires_at > 30.days.from_now
+      errors.add(:expires_at, 'cannot be more than 30 days in the future')
+    end
   end
 end
