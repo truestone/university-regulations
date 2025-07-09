@@ -24,6 +24,10 @@ gem 'redis', '~> 5.0'
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 gem 'kredis'
 
+# Redis session store
+gem 'redis-session-store'
+gem 'connection_pool'
+
 # Use Active Model has_secure_password [https://github.com/bcrypt-ruby/bcrypt-ruby]
 gem 'bcrypt', '~> 3.1.7'
 
@@ -54,6 +58,9 @@ gem 'stimulus-rails'
 # 백그라운드 작업
 gem 'sidekiq'
 
+# Rails Admin
+gem 'rails_admin'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[ mri mingw x64_mingw ]
@@ -61,11 +68,16 @@ group :development, :test do
   # Testing
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  gem 'rspec_junit_formatter'
+  gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'webdrivers'
   
   # Code quality
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
+  gem 'brakeman', require: false
 end
 
 group :development do
@@ -78,3 +90,8 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   gem 'spring'
 end
+
+gem "shoulda-matchers", "~> 6.5", group: :test
+gem "database_cleaner-active_record", "~> 2.2", group: :test
+gem "sassc-rails"
+gem "sassc-rails"
