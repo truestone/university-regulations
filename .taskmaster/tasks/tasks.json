@@ -226,7 +226,7 @@
             "description": "Rails 애플리케이션에 Rails Admin을 추가하고 관리자 인터페이스의 기본 동작을 확보한다.",
             "dependencies": [],
             "details": "• Gemfile에 rails_admin, devise(필요 시) 추가\n• bundle install 실행\n• rails g rails_admin:install 명령으로 초기 설정 및 마이그레이션 생성\n• rails db:migrate 수행 후 /admin 접속 확인",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -237,8 +237,8 @@
               1
             ],
             "details": "• rails_admin.rb 초기화 파일에서 config.navigation_static_* 설정 확인\n• gem 'rails_admin_tree_view' 또는 커스텀 JS/CSS 삽입으로 트리 뷰 구성\n• 앱 자바스크립트/스타일시트에 필요한 플러그인 로드\n• 브라우저에서 트리 네비게이션 동작 테스트",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ 네비게이션 라벨 및 weight 설정 완료\n✅ 계층 구조 순서 확인 (Edition→Chapter→Regulation→Article→Clause)\n✅ Active Storage 모델 숨김 처리 완료\n✅ 커스텀 CSS 스타일 적용\n✅ 브라우저에서 트리 네비게이션 동작 확인"
           },
           {
             "id": 3,
@@ -699,7 +699,7 @@
     ],
     "metadata": {
       "created": "2025-07-06T13:17:48.408Z",
-      "updated": "2025-07-06T13:17:48.408Z",
+      "updated": "2025-07-09T06:50:24.763Z",
       "description": "Tasks for master context"
     }
   }
