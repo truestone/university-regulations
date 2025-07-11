@@ -340,8 +340,8 @@
               4
             ],
             "details": "• Sidekiq 미들웨어로 진행률 메시지 발행\n• ActionCable 채널 및 브로드캐스트 구현\n• 프론트엔드 ProgressBar 컴포넌트 연동\n• 산출물: ProgressChannel, 미들웨어 코드, JS 뷰 수정",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ RegulationImportJob 백그라운드 작업 클래스 구현\n✅ RegulationImportChannel ActionCable 채널 구현\n✅ RegulationImportsController 웹 인터페이스 구현\n✅ Stimulus import-progress 컨트롤러 구현\n✅ 실시간 진행률 브로드캐스트 (0-100% 단계별)\n✅ 웹소켓 연결 상태 모니터링 및 재연결\n✅ 작업 취소 기능 및 상태 조회\n✅ 진행률 표시 뷰 (index, show) 구현\n✅ 라우트 설정 및 RESTful API 엔드포인트\n✅ Redis 캐시 기반 진행률 저장 및 복구"
           },
           {
             "id": 6,

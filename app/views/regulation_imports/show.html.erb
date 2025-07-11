@@ -1,0 +1,149 @@
+<div class="container mx-auto px-4 py-8" data-controller="import-progress" 
+     data-import-progress-job-id-value="<%= @job_id %>" 
+     data-import-progress-user-id-value="<%= @user_id %>">
+  
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">임포트 진행률</h1>
+          <p class="text-gray-600">Job ID: <span class="font-mono text-sm"><%= @job_id %></span></p>
+        </div>
+        
+        <div class="flex gap-3">
+          <%= link_to "목록으로", regulation_imports_path, 
+              class: "bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors" %>
+          
+          <button data-action="click->import-progress#cancelJob" 
+                  class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  data-import-progress-target="cancelButton">
+            작업 취소
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 진행률 표시 -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">진행률</span>
+          <span class="text-sm font-medium text-gray-700" data-import-progress-target="percentage">0%</span>
+        </div>
+        
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out" 
+               style="width: 0%" 
+               data-import-progress-target="progressBar"></div>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-lg font-medium text-gray-900 mb-2" data-import-progress-target="message">
+          <% if @progress_data %>
+            <%= @progress_data[:message] %>
+          <% else %>
+            작업 정보를 불러오는 중...
+          <% end %>
+        </p>
+        
+        <p class="text-sm text-gray-500" data-import-progress-target="status">
+          <% if @progress_data %>
+            상태: <%= @progress_data[:status] %>
+          <% else %>
+            연결 중...
+          <% end %>
+        </p>
+      </div>
+    </div>
+
+    <!-- 상세 정보 -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">작업 정보</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-2">시작 시간</h3>
+          <p class="text-sm text-gray-900" data-import-progress-target="startTime">
+            <% if @progress_data %>
+              <%= Time.parse(@progress_data[:timestamp]).strftime("%Y-%m-%d %H:%M:%S") %>
+            <% else %>
+              -
+            <% end %>
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-2">경과 시간</h3>
+          <p class="text-sm text-gray-900" data-import-progress-target="elapsedTime">
+            <% if @progress_data && @progress_data[:elapsed_time] %>
+              <%= "#{@progress_data[:elapsed_time].round(1)}초" %>
+            <% else %>
+              -
+            <% end %>
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-2">연결 상태</h3>
+          <p class="text-sm" data-import-progress-target="connectionStatus">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              연결 중
+            </span>
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-2">마지막 업데이트</h3>
+          <p class="text-sm text-gray-900" data-import-progress-target="lastUpdate">-</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 데이터 (완료 시에만 표시) -->
+    <div class="bg-white rounded-lg shadow-md p-6 hidden" data-import-progress-target="resultSection">
+      <h2 class="text-xl font-semibold mb-4">임포트 결과</h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600" data-import-progress-target="totalRecords">0</div>
+          <div class="text-sm text-gray-500">총 레코드</div>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600" data-import-progress-target="successCount">0</div>
+          <div class="text-sm text-gray-500">성공</div>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-2xl font-bold text-red-600" data-import-progress-target="errorCount">0</div>
+          <div class="text-sm text-gray-500">에러</div>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-600" data-import-progress-target="duration">0s</div>
+          <div class="text-sm text-gray-500">소요 시간</div>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <button data-action="click->import-progress#downloadResult" 
+                class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+          결과 다운로드
+        </button>
+      </div>
+    </div>
+
+    <!-- 로그 섹션 -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">실시간 로그</h2>
+      
+      <div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm h-64 overflow-y-auto" 
+           data-import-progress-target="logContainer">
+        <div data-import-progress-target="logContent">
+          연결을 기다리는 중...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
