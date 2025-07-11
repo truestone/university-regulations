@@ -1,4 +1,6 @@
 class Clause < ApplicationRecord
+  has_paper_trail
+  
   belongs_to :article
   
   validates :number, presence: true

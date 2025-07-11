@@ -1,4 +1,6 @@
 class Regulation < ApplicationRecord
+  has_paper_trail
+  
   belongs_to :chapter
   has_many :articles, dependent: :destroy
   has_many :clauses, through: :articles

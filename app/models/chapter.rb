@@ -1,4 +1,6 @@
 class Chapter < ApplicationRecord
+  has_paper_trail
+  
   belongs_to :edition
   has_many :regulations, dependent: :destroy
   has_many :articles, through: :regulations

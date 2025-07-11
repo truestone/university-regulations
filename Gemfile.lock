@@ -249,6 +249,9 @@ GEM
     nokogiri (1.18.8-x86_64-linux-musl)
       racc (~> 1.4)
     os (1.1.4)
+    paper_trail (16.0.0)
+      activerecord (>= 6.1)
+      request_store (~> 1.4)
     parallel (1.27.0)
     parser (3.3.8.0)
       ast (~> 2.4.1)
@@ -331,6 +334,8 @@ GEM
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
+    request_store (1.7.0)
+      rack (>= 1.4)
     retriable (3.1.2)
     rexml (3.4.1)
     rspec-core (3.13.5)
@@ -490,6 +495,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   jbuilder
   kredis
+  paper_trail
   pg (~> 1.1)
   pgvector
   puma (~> 6.0)

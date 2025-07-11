@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_paper_trail
+  
   has_secure_password validations: false
   
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

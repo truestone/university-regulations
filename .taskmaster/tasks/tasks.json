@@ -218,7 +218,7 @@
         "dependencies": [
           3
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -270,8 +270,8 @@
               4
             ],
             "details": "• Gemfile에 paper_trail 추가 후 bundle install\n• rails generate paper_trail:install && rails db:migrate\n• 각 모델에 has_paper_trail 선언\n• rails_admin.rb에서 PaperTrail history tab 활성화\n• 테스트 계정으로 CRUD 후 로그 확인",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ PaperTrail 젬 설치 및 bundle install 완료\n✅ rails generate paper_trail:install 실행 완료\n✅ versions 테이블 마이그레이션 완료\n✅ 6개 모델에 has_paper_trail 추가 (Edition, Chapter, Regulation, Article, Clause, User)\n✅ Rails Admin audit 설정 활성화 (config.audit_with :paper_trail)\n✅ history_index, history_show 액션 활성화\n✅ 감사 로그 기본 설정 완료"
           }
         ]
       },
@@ -699,7 +699,7 @@
     ],
     "metadata": {
       "created": "2025-07-06T13:17:48.408Z",
-      "updated": "2025-07-09T06:50:24.763Z",
+      "updated": "2025-07-11T01:21:52.145Z",
       "description": "Tasks for master context"
     }
   }

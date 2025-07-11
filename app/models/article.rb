@@ -1,4 +1,6 @@
 class Article < ApplicationRecord
+  has_paper_trail
+  
   belongs_to :regulation
   has_many :clauses, dependent: :destroy
   

@@ -1,4 +1,6 @@
 class Edition < ApplicationRecord
+  has_paper_trail
+  
   has_many :chapters, dependent: :destroy
   has_many :regulations, through: :chapters
   has_many :articles, through: :regulations
