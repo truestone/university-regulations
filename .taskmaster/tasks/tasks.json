@@ -317,8 +317,8 @@
               2
             ],
             "details": "• ActiveRecord 다중 삽입 최적화\n• 트랜잭션 경계 설정 및 오류 발생 시 롤백\n• 대량 데이터 배치 크기 튜닝\n• 산출물: ImportService 클래스, ERD 업데이트",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ RegulationImporter 클래스 완전 구현\n✅ 편별 개별 트랜잭션으로 에러 격리 및 롤백 처리\n✅ find_or_create 패턴으로 ActiveRecord 최적화\n✅ 배치 크기 1000개 단위 튜닝\n✅ 계층 구조 트랜잭션 (Edition→Chapter→Regulation→Article→Clause)\n✅ 샘플 파일 임포트 성공 (3편, 4장, 3규정, 5조문, 2항)\n✅ 에러 복구 메커니즘 및 상세 통계 리포팅\n✅ CSV 에러 로그 및 JSON 결과 출력\n✅ Rake 태스크 CLI 인터페이스 제공"
           },
           {
             "id": 4,
