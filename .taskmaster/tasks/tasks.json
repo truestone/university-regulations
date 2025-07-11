@@ -259,8 +259,8 @@
               3
             ],
             "details": "• rails action_text:install 및 마이그레이션 실행\n• 모델에 has_rich_text :content 추가\n• rails_admin.rb에서 field :content, :action_text 설정\n• 이미지를 위한 ActiveStorage 서비스(Local/S3) 설정 및 업로드 테스트",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ Action Text 설치 및 마이그레이션 완료\n✅ ActionText::RichText 모델 및 테이블 생성 확인\n✅ Article, Regulation 모델에 has_rich_text :rich_content 추가\n✅ Rails Admin에서 action_text 필드 타입 설정 완료\n✅ Active Storage 서비스 (local) 설정 확인\n✅ Rich text 에디터 통합 준비 완료"
           },
           {
             "id": 5,

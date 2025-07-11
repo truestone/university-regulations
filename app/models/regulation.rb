@@ -3,6 +3,9 @@ class Regulation < ApplicationRecord
   has_many :articles, dependent: :destroy
   has_many :clauses, through: :articles
   
+  # Rich text content using Action Text
+  has_rich_text :rich_content
+  
   validates :number, presence: true
   validates :title, presence: true
   validates :regulation_code, presence: true, uniqueness: true, regulation_code: true

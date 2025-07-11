@@ -141,6 +141,10 @@ RailsAdmin.config do |config|
         label 'Content'
         help 'Full text content of the regulation'
       end
+      field :rich_content, :action_text do
+        label 'Rich Content'
+        help 'Rich text content with formatting, images, and links'
+      end
       field :regulation_code do
         label 'Regulation Code'
         help 'Unique regulation identifier code'
@@ -200,6 +204,10 @@ RailsAdmin.config do |config|
       field :content do
         label 'Content'
         help 'Article content text'
+      end
+      field :rich_content, :action_text do
+        label 'Rich Content'
+        help 'Rich text content with formatting, images, and links'
       end
       field :sort_order do
         label 'Sort Order'

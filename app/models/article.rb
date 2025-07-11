@@ -2,6 +2,9 @@ class Article < ApplicationRecord
   belongs_to :regulation
   has_many :clauses, dependent: :destroy
   
+  # Rich text content using Action Text
+  has_rich_text :rich_content
+  
   validates :number, presence: true
   validates :title, presence: true
   validates :content, presence: true
