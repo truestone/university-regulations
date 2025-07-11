@@ -294,8 +294,8 @@
             "description": "대용량 파일을 상태머신 기반으로 파싱할 수 있도록 문법 정의 및 스트리밍 파싱 로직 설계",
             "dependencies": [],
             "details": "• 입력 파일 포맷 명세 수집\n• 상태 전이도 및 에러 상태 정의\n• 메모리 사용량 측정을 위한 벤치마킹 지표 설계\n• 산출물: 파서 설계 문서, UML 상태 다이어그램",
-            "status": "pending",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "✅ 74,706줄 규정집 파일 포맷 분석 완료\n✅ 계층 구조 패턴 정의 (Edition→Chapter→Regulation→Article→Clause)\n✅ 상태머신 설계 및 전이도 작성\n✅ 정규식 패턴 9개 정의 완료\n✅ 메모리 최적화 전략 수립 (스트리밍 파싱, 배치 처리)\n✅ 벤치마킹 도구 구현 (성능/메모리/정확도 측정)\n✅ 파서 설계 문서 작성 완료\n✅ RegulationParser 클래스 구현\n✅ 테스트용 샘플 파일 생성"
           },
           {
             "id": 2,
@@ -582,7 +582,7 @@
           8,
           2
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [
           {
             "id": 1,
@@ -699,7 +699,7 @@
     ],
     "metadata": {
       "created": "2025-07-06T13:17:48.408Z",
-      "updated": "2025-07-11T01:21:52.145Z",
+      "updated": "2025-07-11T01:58:49.350Z",
       "description": "Tasks for master context"
     }
   }
