@@ -69,23 +69,27 @@ class ParserBenchmark
     duration = @end_time - @start_time
     memory_used = @peak_memory - @start_memory
     
+    # 0으로 나누기 방지
+    duration = 0.001 if duration <= 0
+    processed_lines = @processed_lines > 0 ? @processed_lines : 1
+    
     @metrics = {
       # 시간 관련 메트릭
       total_duration: duration,
-      lines_per_second: @processed_lines / duration,
-      average_line_time: duration / @processed_lines,
+      lines_per_second: processed_lines / duration,
+      average_line_time: duration / processed_lines,
       
       # 메모리 관련 메트릭
       start_memory_mb: bytes_to_mb(@start_memory),
       peak_memory_mb: bytes_to_mb(@peak_memory),
       memory_used_mb: bytes_to_mb(memory_used),
-      memory_per_line_bytes: memory_used / @processed_lines,
+      memory_per_line_bytes: memory_used / processed_lines,
       
       # 처리 관련 메트릭
       total_lines: @processed_lines,
       total_errors: @errors.size,
-      error_rate: (@errors.size.to_f / @processed_lines * 100).round(4),
-      success_rate: (100 - (@errors.size.to_f / @processed_lines * 100)).round(4),
+      error_rate: (@errors.size.to_f / processed_lines * 100).round(4),
+      success_rate: (100 - (@errors.size.to_f / processed_lines * 100)).round(4),
       
       # 체크포인트 정보
       checkpoints: @checkpoints,
