@@ -473,9 +473,9 @@
               1,
               2
             ],
-            "details": "• 프롬프트 템플릿 설계(시스템, 사용자, 예시)\n• 검색 결과 요약 및 토큰 제한 내 포함 로직 구현\n• 안전가이드 및 PII 마스킹 모듈 포함\n• 프롬프트-A/B 테스트로 답변 품질 수집",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• RagPromptService 클래스 구현\n• GptAnswerService 클래스 구현\n• PromptTemplate 모델 및 템플릿 관리 시스템\n• 동적 프롬프트 생성 (시스템/사용자/컨텍스트)\n• 토큰 제한 내 검색 결과 요약 및 포함\n• PII 마스킹 및 안전 가이드라인\n• 응답 품질 검증 및 점수 계산\n• A/B 테스트 지원 및 프롬프트 최적화\n• 3가지 응답 형식 (brief/detailed/structured)",
+            "status": "done",
+            "testStrategy": "✅ RagPromptService 클래스 구현 완료\n✅ GptAnswerService 클래스 구현 완료\n✅ PromptTemplate 모델 및 마이그레이션\n✅ 동적 프롬프트 생성 (시스템/사용자/컨텍스트)\n✅ 토큰 제한 내 검색 결과 처리\n✅ PII 마스킹 (이메일/전화번호/주민번호)\n✅ 안전 가이드라인 및 응답 검증\n✅ 품질 점수 계산 (길이/참조/구조/유사도)\n✅ A/B 테스트 지원 (온도/형식 변형)\n✅ 3가지 응답 형식 지원\n✅ 포괄적인 RSpec 테스트 작성"
           },
           {
             "id": 4,
