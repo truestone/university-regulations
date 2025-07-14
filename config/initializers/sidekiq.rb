@@ -23,3 +23,10 @@ Sidekiq.default_job_options = {
 
 # 큐별 설정
 # 큐 설정은 sidekiq.yml 파일이나 실행 시 옵션으로 설정
+
+# Sidekiq Web UI configuration
+require 'sidekiq/web'
+Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
+  # In production, use environment variables
+  [user, password] == ['admin', ENV.fetch('SIDEKIQ_PASSWORD', 'password')]
+end if Rails.env.production?

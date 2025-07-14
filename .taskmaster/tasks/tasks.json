@@ -413,9 +413,9 @@
               2,
               3
             ],
-            "details": "• routes.rb에 Sidekiq::Web 마운트\n• 커스텀 통계 그래프(처리 속도, 실패율) 추가\n• 관리용 권한 체크 및 기본 레이아웃 통합",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• routes.rb에 Sidekiq::Web 마운트 (/sidekiq)\n• AdminConstraint로 관리자 권한 체크\n• 임베딩 전용 대시보드 구축 (/admin/embedding)\n• 실시간 통계 및 진행률 표시\n• Sidekiq 큐 상태 모니터링\n• 최근 임베딩 업데이트 목록\n• 임베딩 관리 작업 버튼 (생성/정리)\n• Tailwind CSS로 반응형 UI 구현",
+            "status": "done",
+            "testStrategy": "✅ Sidekiq Web UI 마운트 및 권한 체크 구현\n✅ AdminConstraint 클래스로 관리자 인증\n✅ 임베딩 대시보드 컨트롤러 메서드 구현\n✅ 포괄적인 통계 표시 (전체/완료/대기/진행률)\n✅ Sidekiq 큐 상태 실시간 모니터링\n✅ 최근 임베딩 업데이트 목록 표시\n✅ 임베딩 관리 작업 버튼 UI\n✅ Tailwind CSS 반응형 대시보드 구현\n✅ Feature 테스트 작성 완료"
           },
           {
             "id": 5,

@@ -1,0 +1,204 @@
+<% content_for :title, "임베딩 대시보드" %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- 헤더 -->
+    <div class="px-4 py-6 sm:px-0">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">임베딩 대시보드</h1>
+          <p class="mt-2 text-sm text-gray-600">OpenAI 임베딩 생성 및 Sidekiq 작업 모니터링</p>
+        </div>
+        <div class="flex space-x-3">
+          <%= link_to "메인 대시보드", admin_dashboard_path, class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+          <%= link_to "Sidekiq Web UI", "/sidekiq", target: "_blank", class: "bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- 통계 카드 -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <!-- 전체 조문 수 -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">전체 조문</dt>
+                <dd class="text-lg font-medium text-gray-900"><%= number_with_delimiter(@embedding_stats[:total_articles]) %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 임베딩 완료 -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">임베딩 완료</dt>
+                <dd class="text-lg font-medium text-gray-900"><%= number_with_delimiter(@embedding_stats[:articles_with_embedding]) %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 임베딩 대기 -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">임베딩 대기</dt>
+                <dd class="text-lg font-medium text-gray-900"><%= number_with_delimiter(@embedding_stats[:articles_without_embedding]) %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 진행률 -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">완료율</dt>
+                <dd class="text-lg font-medium text-gray-900"><%= @embedding_progress %>%</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 진행률 바 -->
+    <div class="bg-white shadow rounded-lg mb-8">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">임베딩 생성 진행률</h3>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: <%= @embedding_progress %>%"></div>
+        </div>
+        <p class="text-sm text-gray-600 mt-2">
+          <%= @embedding_stats[:articles_with_embedding] %> / <%= @embedding_stats[:total_articles] %> 조문 완료
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Sidekiq 큐 상태 -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Sidekiq 큐 상태</h3>
+          <dl class="space-y-3">
+            <div class="flex justify-between">
+              <dt class="text-sm font-medium text-gray-500">처리된 작업</dt>
+              <dd class="text-sm text-gray-900"><%= number_with_delimiter(@sidekiq_stats.processed) %></dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-sm font-medium text-gray-500">실패한 작업</dt>
+              <dd class="text-sm text-gray-900"><%= number_with_delimiter(@sidekiq_stats.failed) %></dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-sm font-medium text-gray-500">대기 중인 작업</dt>
+              <dd class="text-sm text-gray-900"><%= number_with_delimiter(@embedding_queue.size) %></dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-sm font-medium text-gray-500">임베딩 실패</dt>
+              <dd class="text-sm text-gray-900"><%= @embedding_failures.count %></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- 최근 임베딩 업데이트 -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">최근 임베딩 업데이트</h3>
+          <div class="space-y-3">
+            <% if @recent_embeddings.any? %>
+              <% @recent_embeddings.each do |article| %>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      제<%= article.number %>조 <%= article.title %>
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      <%= article.regulation&.title %>
+                    </p>
+                  </div>
+                  <div class="text-xs text-gray-400">
+                    <%= time_ago_in_words(article.embedding_updated_at) %> 전
+                  </div>
+                </div>
+              <% end %>
+            <% else %>
+              <p class="text-sm text-gray-500">최근 업데이트된 임베딩이 없습니다.</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 액션 버튼 -->
+    <div class="mt-8 bg-white shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">임베딩 관리 작업</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button onclick="runEmbeddingTask('generate_all')" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+            전체 생성
+          </button>
+          <button onclick="runEmbeddingTask('generate_missing')" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
+            누락분 생성
+          </button>
+          <button onclick="runEmbeddingTask('update_modified')" class="bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-yellow-700 transition-colors">
+            수정분 업데이트
+          </button>
+          <button onclick="runEmbeddingTask('cleanup')" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors">
+            실패 작업 정리
+          </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+          * 작업은 백그라운드에서 실행됩니다. Sidekiq Web UI에서 진행 상황을 확인할 수 있습니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function runEmbeddingTask(taskName) {
+  if (confirm(`임베딩 ${taskName} 작업을 실행하시겠습니까?`)) {
+    // 실제 구현에서는 AJAX 요청으로 Rake 태스크 실행
+    alert(`${taskName} 작업이 시작되었습니다. Sidekiq Web UI에서 진행 상황을 확인하세요.`);
+  }
+}
+
+// 페이지 자동 새로고침 (30초마다)
+setTimeout(function() {
+  location.reload();
+}, 30000);
+</script>
