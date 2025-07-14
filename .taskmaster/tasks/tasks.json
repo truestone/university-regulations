@@ -400,9 +400,9 @@
               1,
               2
             ],
-            "details": "• lib/tasks/rebuild_api_sync.rake 추가\n• 각 레코드 iterate 하며 ApiSyncWorker.perform_async 호출\n• 대량 실행 시 스로틀링 및 배치 처리 로직 포함",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• lib/tasks/embedding.rake 구현 완료\n• embedding:generate_all - 모든 조문 임베딩 생성\n• embedding:generate_missing - 임베딩 없는 조문만 생성\n• embedding:update_modified - 최근 수정된 조문 업데이트\n• embedding:status - 임베딩 생성 상태 확인\n• embedding:test - 단일 조문 테스트\n• embedding:cleanup - 실패 작업 정리\n• 배치 처리 및 진행률 표시 포함",
+            "status": "done",
+            "testStrategy": "✅ 7개 임베딩 관련 Rake 태스크 구현 완료\n✅ 배치 처리 로직 (find_each batch_size: 100)\n✅ 진행률 추적 및 상태 출력\n✅ 조건부 실행 (needs_embedding_update?)\n✅ 동기/비동기 실행 옵션 제공\n✅ Sidekiq 큐 관리 및 정리 기능\n✅ 포괄적인 Rake 태스크 테스트 작성"
           },
           {
             "id": 4,
