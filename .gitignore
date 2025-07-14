@@ -33,3 +33,6 @@ tmp/
 !tmp/.keep
 
 /config/credentials/development.key
+
+# YoYo AI version control directory
+.yoyo/
