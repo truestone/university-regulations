@@ -450,9 +450,9 @@
             "title": "질문 임베딩 파이프라인 설계 및 구현",
             "description": "사용자 질문을 벡터로 변환하기 위한 임베딩 파이프라인을 정의하고 OpenAI Embedding API를 활용해 저장한다.",
             "dependencies": [],
-            "details": "• 텍스트 전처리 규칙 수립(토큰화, 정규화)\n• OpenAI Embedding 모델 선택 및 호출 래퍼 작성\n• 벡터 결과를 PostgreSQL(pgvector) 테이블에 저장하는 DAO 구현\n• 초기 샘플 데이터 1,000건 임베딩 후 적재",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• QuestionEmbeddingService 클래스 구현\n• 텍스트 전처리 규칙 수립 (정규화, 불용어 제거, 질문 형태 변환)\n• OpenAI text-embedding-3-small 모델 사용\n• 질문 유형 및 복잡도 분석 기능\n• SearchQuery 모델로 검색 로그 및 분석\n• pgvector HNSW 인덱스 최적화\n• 샘플 데이터 생성 Rake 태스크\n• VectorSearchService와 통합",
+            "status": "done",
+            "testStrategy": "✅ QuestionEmbeddingService 클래스 구현 완료\n✅ 텍스트 전처리 파이프라인 (정규화, 불용어 제거)\n✅ 질문 형태 자동 변환 및 검증\n✅ OpenAI API 호출 및 1536차원 벡터 생성\n✅ 질문 유형 분석 (what/how/when/where/why/who)\n✅ 복잡도 분석 (simple/medium/complex/very_complex)\n✅ SearchQuery 모델 및 마이그레이션\n✅ pgvector HNSW 인덱스 설정\n✅ 샘플 데이터 생성 및 분석 도구\n✅ 포괄적인 RSpec 테스트 작성"
           },
           {
             "id": 2,

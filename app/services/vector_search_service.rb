@@ -25,8 +25,16 @@ class VectorSearchService
     Rails.logger.info "Vector search query: #{@query}"
     
     begin
-      # 1. 쿼리 임베딩 생성
-      query_embedding = generate_query_embedding(@query)
+      # 1. 쿼리 임베딩 생성 (개선된 파이프라인 사용)
+      embedding_result = QuestionEmbeddingService.generate_embedding(@query)
+      return [] unless embedding_result
+      
+      query_embedding = embedding_result[:embedding]
+      @preprocessed_query = embedding_result[:preprocessed_text]
+      @query_metadata = {
+        token_count: embedding_result[:token_count],
+        original_question: embedding_result[:original_question]
+      }
       
       # 2. 벡터 유사도 검색 실행
       @results = perform_vector_search(query_embedding)
