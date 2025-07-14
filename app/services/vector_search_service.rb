@@ -36,8 +36,8 @@ class VectorSearchService
         original_question: embedding_result[:original_question]
       }
       
-      # 2. 벡터 유사도 검색 실행
-      @results = perform_vector_search(query_embedding)
+      # 2. 벡터 유사도 검색 실행 (최적화된 검색 사용)
+      @results = perform_optimized_vector_search(query_embedding)
       
       # 3. 결과 후처리
       @results = post_process_results(@results)
@@ -321,3 +321,72 @@ class VectorSearchService
     )
   end
 end
+  # 최적화된 벡터 유사도 검색 실행
+  def perform_optimized_vector_search(query_embedding)
+    # PgvectorOptimizer를 사용한 최적화된 검색
+    optimizer_options = {
+      limit: @options[:limit],
+      similarity_threshold: @options[:similarity_threshold],
+      distance_function: determine_distance_function,
+      use_ivfflat: should_use_ivfflat?,
+      ef_search: determine_ef_search
+    }
+    
+    results = PgvectorOptimizer.search(
+      embedding: query_embedding,
+      **optimizer_options
+    )
+    
+    # 결과를 표준 형식으로 변환
+    formatted_results = results.map { |result| format_optimized_result(result) }
+    
+    Rails.logger.info "Optimized vector search found #{formatted_results.length} results"
+    formatted_results
+  end
+
+  # 거리 함수 결정
+  def determine_distance_function
+    # 기본적으로 cosine 사용, 옵션으로 변경 가능
+    @options[:distance_function] || "cosine"
+  end
+
+  # IVFFlat 사용 여부 결정
+  def should_use_ivfflat?
+    # 대용량 데이터나 높은 처리량이 필요한 경우 IVFFlat 사용
+    article_count = Article.where.not(embedding: nil).count
+    @options[:use_ivfflat] || (article_count > 10000)
+  end
+
+  # ef_search 파라미터 결정
+  def determine_ef_search
+    # 정확도와 속도의 균형을 위한 동적 설정
+    case @options[:limit]
+    when 1..5
+      16  # 적은 결과 요청 시 낮은 ef_search
+    when 6..20
+      40  # 중간 결과 요청 시 기본값
+    else
+      64  # 많은 결과 요청 시 높은 ef_search
+    end
+  end
+
+  # 최적화된 결과 포맷팅
+  def format_optimized_result(result)
+    {
+      id: result[:id],
+      title: result[:title],
+      content: result[:content],
+      number: result[:number],
+      regulation_id: result[:regulation_id],
+      regulation_title: result[:regulation_title],
+      regulation_code: result[:regulation_code],
+      distance: result[:distance],
+      similarity: result[:similarity],
+      full_context: build_full_context(result)
+    }
+  end
+
+  # 전체 컨텍스트 구성
+  def build_full_context(result)
+    "#{result[:regulation_title]} (#{result[:regulation_code]}) > 제#{result[:number]}조 #{result[:title]}"
+  end
