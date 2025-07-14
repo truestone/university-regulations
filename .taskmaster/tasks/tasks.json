@@ -388,9 +388,9 @@
             "dependencies": [
               1
             ],
-            "details": "• 대상 ActiveRecord 모델에 after_commit 블록 작성\n• 변경 사항이 있을 때만 ApiSyncWorker.perform_async 호출\n• 트랜잭션 완료 후 실행되도록 테스트",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• Article 모델에 after_commit :enqueue_embedding_job 추가\n• 변경 사항이 있을 때만 EmbeddingJob.perform_async 호출\n• needs_embedding_update? 메서드로 필요 시에만 실행\n• 트랜잭션 완료 후 실행되도록 구현",
+            "status": "done",
+            "testStrategy": "✅ after_commit 훅 구현 완료 (on: [:create, :update])\n✅ enqueue_embedding_job 메서드 구현\n✅ needs_embedding_update? 조건부 실행 로직\n✅ 트랜잭션 롤백 시 큐 추가 방지 테스트\n✅ 신규 생성/업데이트 시 큐 추가 테스트\n✅ 최신 임베딩 상태 시 스킵 테스트"
           },
           {
             "id": 3,
