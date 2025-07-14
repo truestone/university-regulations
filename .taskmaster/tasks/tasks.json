@@ -370,7 +370,7 @@
         "dependencies": [
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -427,9 +427,9 @@
               3,
               4
             ],
-            "details": "• sidekiq-testing, webmock 라이브러리 설정\n• after_commit 훅 동작 검증\n• 재빌드 태스크 단위/통합 테스트 작성\n• CI 파이프라인에 병렬 실행 추가",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• sidekiq-testing, webmock, vcr 라이브러리 설정\n• OpenAI API 스텁 및 에러 시나리오 구성\n• Sidekiq 테스트 모드 설정 (fake/inline)\n• 통합 테스트 작성 (end-to-end 워크플로)\n• after_commit 훅 동작 검증\n• Rake 태스크 단위/통합 테스트\n• 에러 처리 및 복원력 테스트\n• 성능 및 배치 처리 테스트\n• CI 파이프라인 병렬 실행 (5개 그룹)",
+            "status": "done",
+            "testStrategy": "✅ sidekiq-testing, webmock, vcr 라이브러리 설정\n✅ OpenAI API 스텁 헬퍼 메서드 구현\n✅ Sidekiq 테스트 모드 설정 및 정리\n✅ 포괄적인 통합 테스트 작성\n✅ End-to-end 임베딩 워크플로 테스트\n✅ Rake 태스크 동작 검증\n✅ 에러 처리 및 재시도 로직 테스트\n✅ 성능 및 메모리 사용량 테스트\n✅ CI 파이프라인 병렬 실행 구성\n✅ 테스트 결과 아티팩트 업로드"
           }
         ]
       },
@@ -699,7 +699,7 @@
     ],
     "metadata": {
       "created": "2025-07-06T13:17:48.408Z",
-      "updated": "2025-07-11T07:14:34.778Z",
+      "updated": "2025-07-14T07:56:58.810Z",
       "description": "Tasks for master context"
     }
   }

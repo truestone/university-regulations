@@ -79,6 +79,13 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'webdrivers'
   
+  # Sidekiq testing
+  gem 'sidekiq-testing'
+  
+  # HTTP mocking
+  gem 'webmock'
+  gem 'vcr'
+  
   # Code quality
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false

@@ -14,6 +14,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        test-group: ['models', 'workers', 'controllers', 'features', 'integration']
+    
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -58,14 +62,31 @@ jobs:
       run: bundle exec rubocop --parallel
 
     - name: Run RSpec tests
-      run: bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
+      run: |
+        case "${{ matrix.test-group }}" in
+          models)
+            bundle exec rspec spec/models --format progress --format RspecJunitFormatter --out tmp/rspec_models.xml
+            ;;
+          workers)
+            bundle exec rspec spec/workers --format progress --format RspecJunitFormatter --out tmp/rspec_workers.xml
+            ;;
+          controllers)
+            bundle exec rspec spec/controllers spec/requests --format progress --format RspecJunitFormatter --out tmp/rspec_controllers.xml
+            ;;
+          features)
+            bundle exec rspec spec/features spec/system --format progress --format RspecJunitFormatter --out tmp/rspec_features.xml
+            ;;
+          integration)
+            bundle exec rspec spec/integration spec/tasks --format progress --format RspecJunitFormatter --out tmp/rspec_integration.xml
+            ;;
+        esac
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results
-        path: tmp/rspec_results.xml
+        name: test-results-${{ matrix.test-group }}
+        path: tmp/rspec_*.xml
 
   security:
     runs-on: ubuntu-latest
