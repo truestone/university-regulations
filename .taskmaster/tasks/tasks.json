@@ -479,14 +479,16 @@
           },
           {
             "id": 4,
-            "title": "레이트리밋·캐시 레이어 구축",
-            "description": "API 남용을 방지하고 응답 속도를 개선하기 위해 레이트리밋과 캐싱을 도입한다.",
+            "title": "REST API 엔드포인트 구현",
+            "description": "전체 RAG 시스템을 통합하여 클라이언트가 사용할 수 있는 완전한 REST API를 구현한다.",
             "dependencies": [
+              1,
+              2,
               3
             ],
-            "details": "• Redis 기반 토큰 버킷 레이트리밋 미들웨어 구현\n• 동일 질의+컨텍스트 해시 키로 응답 캐싱\n• 캐시 무효화 정책(TTL 24h, 수동 페일오버) 정의\n• 부하 시나리오로 처리량/히트율 검증",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "• SearchController 확장 및 RAG API 엔드포인트\n• RagOrchestratorService 전체 파이프라인 오케스트레이션\n• Redis 기반 캐싱 및 레이트 리밋 구현\n• 시스템 헬스 체크 및 모니터링 API\n• A/B 테스트 지원 및 검색 통계 API\n• 포괄적인 에러 처리 및 로깅\n• API 문서화 및 요청/응답 검증\n• 성능 최적화 및 캐시 전략",
+            "status": "done",
+            "testStrategy": "✅ SearchController RAG API 엔드포인트 구현\n✅ RagOrchestratorService 파이프라인 오케스트레이션\n✅ Redis 캐싱 및 레이트 리밋 구현\n✅ 시스템 헬스 체크 (DB/Redis/OpenAI/pgvector)\n✅ A/B 테스트 및 검색 통계 API\n✅ 포괄적인 에러 처리 및 HTTP 상태 코드\n✅ API 요청 로깅 및 SearchQuery 저장\n✅ 캐시 키 생성 및 TTL 관리\n✅ 포괄적인 RSpec 요청 테스트\n✅ 성능 분석 및 병목 지점 식별"
           },
           {
             "id": 5,
