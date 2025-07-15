@@ -91,6 +91,17 @@ group :development, :test do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
   gem 'brakeman', require: false
+  
+  # Performance testing
+  gem 'benchmark-ips'
+  gem 'memory_profiler'
+  
+  # Security testing
+  gem 'bundler-audit'
+  
+  # Test coverage
+  gem 'simplecov', require: false
+  gem 'simplecov-lcov', require: false
 end
 
 group :development do

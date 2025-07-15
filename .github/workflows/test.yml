@@ -16,7 +16,7 @@ jobs:
     
     strategy:
       matrix:
-        test-group: ['models', 'workers', 'controllers', 'features', 'integration']
+        test-group: ['models', 'workers', 'controllers', 'features', 'integration', 'performance', 'security']
     
     services:
       postgres:
@@ -62,6 +62,11 @@ jobs:
       run: bundle exec rubocop --parallel
 
     - name: Run RSpec tests
+      env:
+        COVERAGE: true
+        CI: true
+        FAIL_ON_LOW_COVERAGE: true
+        TEST_GROUP: ${{ matrix.test-group }}
       run: |
         case "${{ matrix.test-group }}" in
           models)
@@ -79,6 +84,12 @@ jobs:
           integration)
             bundle exec rspec spec/integration spec/tasks --format progress --format RspecJunitFormatter --out tmp/rspec_integration.xml
             ;;
+          performance)
+            bundle exec rspec spec/performance --format progress --format RspecJunitFormatter --out tmp/rspec_performance.xml
+            ;;
+          security)
+            bundle exec rspec spec/security --format progress --format RspecJunitFormatter --out tmp/rspec_security.xml
+            ;;
         esac
 
     - name: Upload test results
@@ -87,6 +98,15 @@ jobs:
       with:
         name: test-results-${{ matrix.test-group }}
         path: tmp/rspec_*.xml
+
+    - name: Upload coverage results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-${{ matrix.test-group }}
+        path: |
+          tmp/coverage/
+          coverage/
 
   security:
     runs-on: ubuntu-latest
@@ -106,9 +126,51 @@ jobs:
         gem install brakeman
         brakeman --format json --output tmp/brakeman_results.json || true
 
+    - name: Run Bundler Audit
+      run: |
+        bundle exec bundle-audit check --update --format json --output tmp/bundler_audit_results.json || true
+
+    - name: Run dependency vulnerability scan
+      run: |
+        gem install bundler-audit
+        bundle-audit check --update --format json --output tmp/dependency_scan.json || true
+
     - name: Upload security scan results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-results
-        path: tmp/brakeman_results.json
+        path: |
+          tmp/brakeman_results.json
+          tmp/bundler_audit_results.json
+          tmp/dependency_scan.json
+
+  coverage-report:
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download coverage artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: coverage-*
+        merge-multiple: true
+        path: coverage-results/
+
+    - name: Merge coverage reports
+      run: |
+        # Create merged coverage report
+        echo "Coverage results from all test groups:" > coverage-summary.txt
+        find coverage-results -name "*.json" -exec cat {} \; >> coverage-summary.txt || true
+
+    - name: Upload merged coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: merged-coverage-report
+        path: |
+          coverage-results/
+          coverage-summary.txt
