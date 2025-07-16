@@ -1,0 +1,41 @@
+<div class="mb-4 <%= 'flex justify-end' if message.user_message? %>" id="message_<%= message.id %>">
+  <div class="max-w-3xl <%= message.user_message? ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900' %> rounded-lg p-3 shadow-sm">
+    <!-- 메시지 헤더 -->
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center space-x-2">
+        <span class="text-xs font-medium <%= message.user_message? ? 'text-blue-100' : 'text-gray-600' %>">
+          <%= message.user_message? ? '사용자' : 'AI 어시스턴트' %>
+        </span>
+        <span class="text-xs <%= message.user_message? ? 'text-blue-200' : 'text-gray-500' %>">
+          <%= time_ago_in_words(message.created_at) %> 전
+        </span>
+      </div>
+      <span class="text-xs <%= message.user_message? ? 'text-blue-200' : 'text-gray-500' %>">
+        <%= message.tokens_used %> 토큰
+      </span>
+    </div>
+
+    <!-- 메시지 내용 -->
+    <div class="prose prose-sm max-w-none <%= message.user_message? ? 'prose-invert' : '' %>">
+      <%= simple_format(message.content) %>
+    </div>
+
+    <!-- AI 메시지의 경우 소스 정보 표시 -->
+    <% if message.assistant_message? && message.metadata&.dig('sources')&.any? %>
+      <div class="mt-3 pt-3 border-t <%= message.user_message? ? 'border-blue-500' : 'border-gray-300' %>">
+        <details class="text-xs">
+          <summary class="cursor-pointer <%= message.user_message? ? 'text-blue-200' : 'text-gray-600' %> hover:underline">
+            참고 자료 (<%= message.metadata['sources'].size %>개)
+          </summary>
+          <div class="mt-2 space-y-1">
+            <% message.metadata['sources'].each do |source| %>
+              <div class="<%= message.user_message? ? 'text-blue-100' : 'text-gray-700' %>">
+                • <%= source['title'] %> (ID: <%= source['id'] %>)
+              </div>
+            <% end %>
+          </div>
+        </details>
+      </div>
+    <% end %>
+  </div>
+</div>

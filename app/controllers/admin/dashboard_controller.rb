@@ -1,3 +1,21 @@
+class Admin::DashboardController < ApplicationController
+  before_action :require_admin
+  before_action :check_session_expiry
+
+  def index
+    @current_user = current_user
+    
+    # 기본 통계 정보
+    @stats = {
+      total_regulations: Regulation.count,
+      total_articles: Article.count,
+      total_users: User.count,
+      recent_logins: User.where('last_login_at > ?', 7.days.ago).count
+    }
+    
+    # 최근 활동
+    @recent_activities = []
+  end
 
   def embedding
     @current_user = current_user
@@ -36,3 +54,4 @@
     with_embedding = Article.where.not(embedding: nil).count
     ((with_embedding.to_f / total) * 100).round(2)
   end
+end

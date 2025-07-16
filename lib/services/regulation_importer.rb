@@ -210,17 +210,26 @@ class RegulationImporter
   end
 
   def find_or_create_regulation(chapter, regulation_data)
-    Regulation.find_or_initialize_by(
-      regulation_code: regulation_data[:code]
-    ).tap do |regulation|
-      regulation.chapter = chapter
-      regulation.title = regulation_data[:title]
-      regulation.content = regulation_data[:content] if regulation_data[:content]
-      regulation.number = extract_regulation_number(regulation_data[:code])
-      regulation.status = 'active'
-      regulation.sort_order = regulation.number
-      regulation.is_active = true
-      regulation.save
+    # 코드가 없는 경우 제목으로 찾기
+    if regulation_data[:code].present?
+      regulation = Regulation.find_or_initialize_by(regulation_code: regulation_data[:code])
+    else
+      regulation = Regulation.find_or_initialize_by(
+        chapter: chapter,
+        title: regulation_data[:title]
+      )
+    end
+    
+    regulation.tap do |reg|
+      reg.chapter = chapter
+      reg.title = regulation_data[:title]
+      reg.content = regulation_data[:content] if regulation_data[:content]
+      reg.regulation_code = regulation_data[:code] if regulation_data[:code]
+      reg.number = extract_regulation_number(regulation_data[:code]) if regulation_data[:code]
+      reg.status = 'active'
+      reg.sort_order = reg.number || 0
+      reg.is_active = true
+      reg.save
     end
   end
 
@@ -251,6 +260,8 @@ class RegulationImporter
   end
 
   def extract_regulation_number(regulation_code)
+    return 0 unless regulation_code.present?
+    
     # 규정 코드에서 번호 추출 (예: "3-1-5" -> 5)
     parts = regulation_code.split('-')
     parts.last.to_i

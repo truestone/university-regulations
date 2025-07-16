@@ -1,0 +1,44 @@
+<%= form_with model: [conversation, message], 
+    local: false, 
+    data: { 
+      turbo_stream: true, 
+      chat_target: "form",
+      action: "turbo:submit-end->chat#scrollToBottom"
+    },
+    class: "bg-white rounded-lg shadow-sm border border-gray-200 p-4" do |form| %>
+  
+  <div class="flex space-x-3">
+    <div class="flex-1">
+      <%= form.text_area :content, 
+          placeholder: "규정에 대해 궁금한 것을 물어보세요...", 
+          rows: 3,
+          class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none",
+          data: { 
+            chat_target: "input",
+            action: "keydown->chat#handleKeydown"
+          },
+          required: true %>
+      
+      <% if message.errors.any? %>
+        <div class="mt-2 text-sm text-red-600">
+          <% message.errors.full_messages.each do |error| %>
+            <p><%= error %></p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="flex flex-col justify-end">
+      <%= form.submit "전송", 
+          class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
+          data: { 
+            chat_target: "submit",
+            disable_with: "전송 중..."
+          } %>
+      
+      <div class="mt-2 text-xs text-gray-500 text-center">
+        Ctrl+Enter로 전송
+      </div>
+    </div>
+  </div>
+<% end %>

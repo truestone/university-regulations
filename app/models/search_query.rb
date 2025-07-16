@@ -3,8 +3,8 @@
 # 검색 쿼리 로그 및 분석을 위한 모델
 class SearchQuery < ApplicationRecord
   validates :query_text, presence: true
-  validates :embedding, presence: true, embedding: true
   validates :response_time_ms, presence: true, numericality: { greater_than: 0 }
+  validates :results_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   scope :recent, -> { where('created_at > ?', 1.week.ago) }
   scope :successful, -> { where.not(error_message: nil) }

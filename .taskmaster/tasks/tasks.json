@@ -524,7 +524,7 @@
             "description": "채팅 기능을 위한 RESTful 라우트와 컨트롤러 액션을 정의한다.",
             "dependencies": [],
             "details": "• Rails routes.rb에 채팅용 자원 정의\n• MessagesController, RoomsController 생성\n• 인증·권한 필터 추가\n• 기본 CRUD 및 JSON 응답 설정",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -701,7 +701,7 @@
     ],
     "metadata": {
       "created": "2025-07-06T13:17:48.408Z",
-      "updated": "2025-07-14T07:56:58.810Z",
+      "updated": "2025-07-16T06:09:35.235Z",
       "description": "Tasks for master context"
     }
   }

@@ -4,7 +4,7 @@ class CreateSearchQueries < ActiveRecord::Migration[8.0]
   def change
     create_table :search_queries do |t|
       t.text :query_text, null: false
-      t.vector :embedding, limit: 1536, null: false
+      t.column :embedding, 'vector(1536)', null: false
       t.integer :results_count, null: false, default: 0
       t.integer :response_time_ms, null: false
       t.jsonb :metadata, default: {}

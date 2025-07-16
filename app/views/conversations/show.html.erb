@@ -1,0 +1,51 @@
+<% content_for :title, @conversation.title %>
+
+<div class="max-w-4xl mx-auto p-4" data-controller="chat" data-chat-conversation-id-value="<%= @conversation.id %>">
+  <!-- 채팅 헤더 -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 p-4">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-xl font-semibold text-gray-900"><%= @conversation.title %></h1>
+        <p class="text-sm text-gray-500">
+          세션 만료: <%= time_ago_in_words(@conversation.expires_at) %> 후
+          (<%= @conversation.expires_at.strftime('%Y-%m-%d %H:%M') %>)
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <%= button_to "세션 연장", extend_session_conversation_path(@conversation), 
+            method: :post, 
+            class: "px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700",
+            title: "세션을 7일 연장합니다" %>
+        <%= button_to "대화 종료", conversation_path(@conversation), 
+            method: :delete, 
+            class: "px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700",
+            confirm: "정말로 대화를 종료하시겠습니까?",
+            title: "대화를 완전히 삭제합니다" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메시지 영역 -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
+    <div class="h-96 overflow-y-auto p-4" id="messages" data-chat-target="messages">
+      <% if @messages.any? %>
+        <% @messages.each do |message| %>
+          <%= render "messages/message", message: message %>
+        <% end %>
+      <% else %>
+        <div class="text-center text-gray-500 py-8">
+          <p>아직 메시지가 없습니다.</p>
+          <p class="text-sm">규정에 대해 궁금한 것을 물어보세요!</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 메시지 입력 폼 -->
+  <div id="message-form">
+    <%= render "messages/form", conversation: @conversation, message: Message.new %>
+  </div>
+</div>
+
+<!-- Turbo Streams 구독 -->
+<%= turbo_stream_from "conversation_#{@conversation.id}" %>

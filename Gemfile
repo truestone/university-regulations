@@ -64,8 +64,6 @@ gem 'rails_admin'
 # Auditing
 gem 'paper_trail'
 
-# OpenAI API
-gem 'ruby-openai'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -79,8 +77,8 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'webdrivers'
   
-  # Sidekiq testing
-  gem 'sidekiq-testing'
+  # Sidekiq testing (included in sidekiq gem)
+  # gem 'sidekiq-testing'
   
   # HTTP mocking
   gem 'webmock'
@@ -117,5 +115,3 @@ end
 
 gem "shoulda-matchers", "~> 6.5", group: :test
 gem "database_cleaner-active_record", "~> 2.2", group: :test
-gem "sassc-rails"
-gem "sassc-rails"

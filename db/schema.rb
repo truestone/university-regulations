@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_11_011800) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_14_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -146,6 +146,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_11_011800) do
     t.index ["tokens_used"], name: "index_messages_on_tokens_used"
   end
 
+  create_table "prompt_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "template_type", null: false
+    t.text "content", null: false
+    t.integer "version", default: 1, null: false
+    t.text "description"
+    t.string "created_by"
+    t.boolean "is_active", default: false, null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_prompt_templates_on_is_active"
+    t.index ["metadata"], name: "index_prompt_templates_on_metadata", using: :gin
+    t.index ["name", "version"], name: "index_prompt_templates_on_name_and_version", unique: true
+    t.index ["template_type", "is_active"], name: "index_prompt_templates_on_template_type_and_is_active"
+  end
+
   create_table "regulations", force: :cascade do |t|
     t.bigint "chapter_id", null: false
     t.integer "number", null: false
@@ -165,6 +182,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_11_011800) do
     t.index ["status", "chapter_id"], name: "index_regulations_on_status_chapter"
     t.index ["status"], name: "index_regulations_on_status"
   end
+
+# Could not dump table "search_queries" because of following StandardError
+#   Unknown type 'vector(1536)' for column 'embedding'
+
 
   create_table "users", force: :cascade do |t|
     t.string "email"

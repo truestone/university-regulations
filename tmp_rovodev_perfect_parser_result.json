@@ -1,0 +1,77 @@
+{
+  "editions": [
+    {
+      "number": 1,
+      "title": "학교법인",
+      "chapters": [
+
+      ]
+    },
+    {
+      "number": 2,
+      "title": "학 칙",
+      "chapters": [
+
+      ]
+    },
+    {
+      "number": 3,
+      "title": "행 정",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "일반 행정",
+          "regulations": [
+
+          ],
+          "sections": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "위원회",
+      "chapters": [
+
+      ]
+    },
+    {
+      "number": 5,
+      "title": "부속기관․부설연구기관․부속병원",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "부속기관",
+          "regulations": [
+
+          ],
+          "sections": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "산학협력단",
+      "chapters": [
+
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 74706,
+    "processed_lines": 5753,
+    "skipped_lines": 42389,
+    "editions": 6,
+    "chapters": 2,
+    "sections": 0,
+    "subsections": 0,
+    "regulations": 0,
+    "articles": 0,
+    "clauses": 0,
+    "noise_filtered": 7697
+  }
+}

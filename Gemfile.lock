@@ -84,6 +84,7 @@ GEM
     base64 (0.3.0)
     bcrypt (3.1.20)
     benchmark (0.4.1)
+    benchmark-ips (2.14.0)
     bigdecimal (3.2.2)
     bindex (0.8.1)
     bootsnap (1.18.6)
@@ -91,6 +92,9 @@ GEM
     brakeman (7.0.2)
       racc
     builder (3.3.0)
+    bundler-audit (0.9.2)
+      bundler (>= 1.2.0, < 3)
+      thor (~> 1.0)
     capybara (3.40.0)
       addressable
       matrix
@@ -102,6 +106,9 @@ GEM
       xpath (~> 3.2)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.3)
+    crack (1.0.0)
+      bigdecimal
+      rexml
     crass (1.0.6)
     csv (3.3.5)
     database_cleaner-active_record (2.2.1)
@@ -114,6 +121,7 @@ GEM
       reline (>= 0.3.8)
     declarative (0.0.20)
     diff-lcs (1.6.2)
+    docile (1.4.1)
     drb (2.2.3)
     erb (5.0.1)
     erubi (1.13.1)
@@ -163,6 +171,7 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
+    hashdiff (1.2.0)
     httpclient (2.9.0)
       mutex_m
     i18n (1.14.7)
@@ -210,6 +219,7 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.3)
+    memory_profiler (1.1.0)
     mini_magick (5.2.0)
       benchmark
       logger
@@ -415,6 +425,13 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.1)
+    simplecov-lcov (0.8.0)
+    simplecov_json_formatter (0.1.4)
     spring (4.3.0)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
@@ -452,6 +469,8 @@ GEM
     unicode-emoji (4.0.4)
     uri (1.0.3)
     useragent (0.16.11)
+    vcr (6.3.1)
+      base64
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -461,6 +480,10 @@ GEM
       nokogiri (~> 1.6)
       rubyzip (>= 1.3.0)
       selenium-webdriver (~> 4.0, < 4.11)
+    webmock (3.25.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket (1.2.11)
     websocket-driver (0.8.0)
       base64
@@ -483,8 +506,10 @@ PLATFORMS
 DEPENDENCIES
   anthropic
   bcrypt (~> 3.1.7)
+  benchmark-ips
   bootsnap
   brakeman
+  bundler-audit
   capybara
   connection_pool
   database_cleaner-active_record (~> 2.2)
@@ -495,6 +520,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   jbuilder
   kredis
+  memory_profiler
   paper_trail
   pg (~> 1.1)
   pgvector
@@ -514,14 +540,18 @@ DEPENDENCIES
   selenium-webdriver
   shoulda-matchers (~> 6.5)
   sidekiq
+  simplecov
+  simplecov-lcov
   spring
   sprockets-rails
   stimulus-rails
   tailwindcss-rails
   turbo-rails
   tzinfo-data
+  vcr
   web-console
   webdrivers
+  webmock
 
 RUBY VERSION
    ruby 3.3.8p144

@@ -1,30 +1,25 @@
 class Regulation < ApplicationRecord
-  has_paper_trail
-  
   belongs_to :chapter
   has_many :articles, dependent: :destroy
   has_many :clauses, through: :articles
-  
-  # Rich text content using Action Text
-  has_rich_text :rich_content
-  
-  validates :number, presence: true
+
   validates :title, presence: true
-  validates :regulation_code, presence: true, uniqueness: true, regulation_code: true
-  validates :status, presence: true, inclusion: { in: %w[active inactive abolished] }
+  validates :regulation_code, presence: true, uniqueness: true
+  validates :number, presence: true
   validates :sort_order, presence: true
-  validates :number, uniqueness: { scope: :chapter_id }
-  validates :sort_order, uniqueness: { scope: :chapter_id }
-  
-  scope :active, -> { where(is_active: true, status: 'active') }
+
+  scope :by_chapter, ->(chapter) { where(chapter: chapter) }
   scope :ordered, -> { order(:sort_order) }
-  scope :by_status, ->(status) { where(status: status) }
-  
+
   def full_title
-    "Regulation #{regulation_code}: #{title}"
+    "#{regulation_code} #{title}"
   end
-  
-  def abolished?
-    status == 'abolished'
+
+  def chapter_title
+    chapter&.title
+  end
+
+  def edition_title
+    chapter&.edition&.title
   end
 end

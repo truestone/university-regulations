@@ -1,4 +1,216 @@
-<div>
-  <h1 class="font-bold text-4xl">Admin::Dashboard#index</h1>
-  <p>Find me in app/views/admin/dashboard/index.html.erb</p>
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-white shadow">
+    <div class="px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+      <div class="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center">
+            <div>
+              <div class="flex items-center">
+                <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
+                  관리자 대시보드
+                </h1>
+              </div>
+              <dl class="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
+                <dt class="sr-only">사용자</dt>
+                <dd class="flex items-center text-sm text-gray-500 font-medium capitalize sm:mr-6">
+                  <%= @current_user.name %> (<%= @current_user.role %>)
+                </dd>
+                <dt class="sr-only">마지막 로그인</dt>
+                <dd class="mt-3 flex items-center text-sm text-gray-500 font-medium sm:mr-6 sm:mt-0 capitalize">
+                  마지막 로그인: <%= @current_user.last_login_at&.strftime("%Y-%m-%d %H:%M") || "정보 없음" %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex space-x-3 md:mt-0 md:ml-4">
+          <%= link_to "로그아웃", logout_path, method: :delete, 
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Statistics Cards -->
+      <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
+                  <span class="text-white text-sm font-medium">규</span>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">총 규정 수</dt>
+                  <dd class="text-lg font-medium text-gray-900"><%= @stats[:total_regulations] %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                  <span class="text-white text-sm font-medium">조</span>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">총 조문 수</dt>
+                  <dd class="text-lg font-medium text-gray-900"><%= @stats[:total_articles] %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                  <span class="text-white text-sm font-medium">사</span>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">총 사용자 수</dt>
+                  <dd class="text-lg font-medium text-gray-900"><%= @stats[:total_users] %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                  <span class="text-white text-sm font-medium">활</span>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">최근 7일 로그인</dt>
+                  <dd class="text-lg font-medium text-gray-900"><%= @stats[:recent_logins] %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mt-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">빠른 액션</h3>
+            <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <%= link_to admin_dashboard_embedding_path, 
+                  class: "relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400" do %>
+                <div>
+                  <span class="rounded-lg inline-flex p-3 bg-indigo-50 text-indigo-700 ring-4 ring-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </span>
+                </div>
+                <div class="mt-8">
+                  <h3 class="text-lg font-medium">
+                    <span class="absolute inset-0" aria-hidden="true"></span>
+                    임베딩 관리
+                  </h3>
+                  <p class="mt-2 text-sm text-gray-500">
+                    벡터 임베딩 상태 확인 및 관리
+                  </p>
+                </div>
+              <% end %>
+              
+              <%= link_to regulation_imports_path, 
+                  class: "relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-300 hover:border-gray-400" do %>
+                <div>
+                  <span class="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                  </span>
+                </div>
+                <div class="mt-8">
+                  <h3 class="text-lg font-medium">
+                    <span class="absolute inset-0" aria-hidden="true"></span>
+                    규정 가져오기
+                  </h3>
+                  <p class="mt-2 text-sm text-gray-500">
+                    새로운 규정 파일 업로드 및 파싱
+                  </p>
+                </div>
+              <% end %>
+              
+              <div class="relative group bg-white p-6 rounded-lg border border-gray-300">
+                <div>
+                  <span class="rounded-lg inline-flex p-3 bg-purple-50 text-purple-700 ring-4 ring-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </span>
+                </div>
+                <div class="mt-8">
+                  <h3 class="text-lg font-medium text-gray-400">
+                    검색 관리
+                  </h3>
+                  <p class="mt-2 text-sm text-gray-500">
+                    검색 쿼리 및 결과 분석 (준비 중)
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="mt-8">
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">시스템 상태</h3>
+            <div class="mt-5">
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium text-gray-900">데이터베이스</p>
+                      <p class="text-sm text-gray-500">정상 작동</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium text-gray-900">Redis 세션</p>
+                      <p class="text-sm text-gray-500">정상 작동</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

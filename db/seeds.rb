@@ -58,6 +58,7 @@ openai_setting = AiSetting.create!(
 anthropic_setting = AiSetting.create!(
   provider: 'anthropic',
   model_id: 'claude-3-sonnet',
+  api_key: 'sk-test-key-anthropic',
   monthly_budget: 500.00,
   usage_this_month: 0.00,
   is_active: false

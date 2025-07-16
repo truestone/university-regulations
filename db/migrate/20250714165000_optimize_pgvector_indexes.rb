@@ -8,44 +8,44 @@ class OptimizePgvectorIndexes < ActiveRecord::Migration[8.0]
 
     # Articles 테이블용 최적화된 HNSW 인덱스
     # m=16, ef_construction=64로 설정하여 검색 품질과 속도 균형
-    add_index :articles, :embedding, 
-              using: :hnsw, 
-              opclass: :vector_cosine_ops,
-              with: 'm=16, ef_construction=64',
-              name: 'idx_articles_embedding_hnsw_optimized'
+    execute <<-SQL
+      CREATE INDEX idx_articles_embedding_hnsw_optimized 
+      ON articles USING hnsw (embedding vector_cosine_ops) 
+      WITH (m = 16, ef_construction = 64);
+    SQL
 
     # 대안으로 IVFFlat 인덱스도 생성 (대용량 데이터용)
     # lists=100으로 설정 (일반적으로 행 수의 sqrt 정도)
-    add_index :articles, :embedding,
-              using: :ivfflat,
-              opclass: :vector_cosine_ops,
-              with: 'lists=100',
-              name: 'idx_articles_embedding_ivfflat'
+    execute <<-SQL
+      CREATE INDEX idx_articles_embedding_ivfflat 
+      ON articles USING ivfflat (embedding vector_cosine_ops) 
+      WITH (lists = 100);
+    SQL
 
     # SearchQueries 테이블용 HNSW 인덱스
-    add_index :search_queries, :embedding,
-              using: :hnsw,
-              opclass: :vector_cosine_ops,
-              with: 'm=16, ef_construction=64',
-              name: 'idx_search_queries_embedding_hnsw'
+    execute <<-SQL
+      CREATE INDEX idx_search_queries_embedding_hnsw 
+      ON search_queries USING hnsw (embedding vector_cosine_ops) 
+      WITH (m = 16, ef_construction = 64);
+    SQL
 
     # L2 거리용 인덱스도 추가
-    add_index :articles, :embedding,
-              using: :hnsw,
-              opclass: :vector_l2_ops,
-              with: 'm=16, ef_construction=64',
-              name: 'idx_articles_embedding_l2'
+    execute <<-SQL
+      CREATE INDEX idx_articles_embedding_l2 
+      ON articles USING hnsw (embedding vector_l2_ops) 
+      WITH (m = 16, ef_construction = 64);
+    SQL
 
     # 내적용 인덱스
-    add_index :articles, :embedding,
-              using: :hnsw,
-              opclass: :vector_ip_ops,
-              with: 'm=16, ef_construction=64',
-              name: 'idx_articles_embedding_ip'
+    execute <<-SQL
+      CREATE INDEX idx_articles_embedding_ip 
+      ON articles USING hnsw (embedding vector_ip_ops) 
+      WITH (m = 16, ef_construction = 64);
+    SQL
 
     # 복합 인덱스 (is_active와 함께)
     execute <<-SQL
-      CREATE INDEX CONCURRENTLY idx_articles_active_embedding 
+      CREATE INDEX idx_articles_active_embedding 
       ON articles (is_active) 
       WHERE is_active = true AND embedding IS NOT NULL;
     SQL

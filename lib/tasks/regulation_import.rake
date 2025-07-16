@@ -37,8 +37,8 @@ namespace :regulation do
       puts "\n❌ 임포트 작업 실패"
       
       # 에러 로그 저장
-      error_file = importer.save_error_log
-      puts "📄 에러 로그 저장: #{error_file}"
+      # error_file = importer.save_error_log
+      # puts "📄 에러 로그 저장: #{error_file}"
       
       exit 1
     end
