@@ -4,6 +4,7 @@
 class ConversationsController < ApplicationController
   before_action :ensure_session_id
   before_action :set_conversation, only: [:show, :destroy, :extend_session]
+  # 인증 불필요 - 익명 사용자도 채팅 가능
   before_action :check_conversation_active, only: [:show]
   
   # GET /chat/:id

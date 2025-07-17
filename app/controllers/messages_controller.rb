@@ -5,6 +5,7 @@ class MessagesController < ApplicationController
   before_action :ensure_session_id
   before_action :set_conversation
   before_action :check_conversation_active
+  # 인증 불필요 - 익명 사용자도 메시지 전송 가능
   
   # POST /chat/:conversation_id/messages
   def create

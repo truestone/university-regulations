@@ -1,52 +1,113 @@
 <% content_for :title, @conversation.title %>
 
-<div class="max-w-4xl mx-auto p-4" data-controller="chat" data-chat-conversation-id-value="<%= @conversation.id %>">
-  <!-- 채팅 헤더 -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 p-4">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-xl font-semibold text-gray-900"><%= @conversation.title %></h1>
-        <p class="text-sm text-gray-500">
-          세션 만료: <%= time_ago_in_words(@conversation.expires_at) %> 후
-          (<%= @conversation.expires_at.strftime('%Y-%m-%d %H:%M') %>)
-        </p>
-      </div>
-      <div class="flex space-x-2">
-        <%= button_to "세션 연장", extend_session_conversation_path(@conversation), 
-            method: :post, 
-            class: "px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700",
-            title: "세션을 7일 연장합니다" %>
-        <%= button_to "대화 종료", conversation_path(@conversation), 
-            method: :delete, 
-            class: "px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700",
-            confirm: "정말로 대화를 종료하시겠습니까?",
-            title: "대화를 완전히 삭제합니다" %>
-      </div>
-    </div>
-  </div>
-
-  <!-- 메시지 영역 -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
-    <div class="h-96 overflow-y-auto p-4" id="messages" data-chat-target="messages">
-      <% if @messages.any? %>
-        <% @messages.each do |message| %>
-          <%= render "messages/message", message: message %>
-        <% end %>
-      <% else %>
-        <div class="text-center text-gray-500 py-8">
-          <p>아직 메시지가 없습니다.</p>
-          <p class="text-sm">규정에 대해 궁금한 것을 물어보세요!</p>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+  <!-- 상단 네비게이션 바 -->
+  <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-xl font-semibold text-gray-900 dark:text-white">규정 관리 시스템</h1>
+          <span class="hidden sm:inline-block px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full">
+            AI 채팅
+          </span>
         </div>
-      <% end %>
-      
-      <!-- 로딩 인디케이터 (Turbo Streams로 제어) -->
-      <div id="loadingIndicator" data-chat-target="loadingIndicator"></div>
+        
+        <div class="flex items-center space-x-4">
+          <%= render "shared/dark_mode_toggle" %>
+          
+          <!-- 로그인/사용자 메뉴 -->
+          <% if user_signed_in? %>
+            <div class="flex items-center space-x-3">
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                <%= current_user.name %>
+              </span>
+              <%= button_to "로그아웃", logout_path, 
+                  method: :delete,
+                  class: "inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-800 rounded-lg transition-colors",
+                  confirm: "정말로 로그아웃하시겠습니까?" %>
+            </div>
+          <% else %>
+            <div class="flex items-center space-x-3">
+              <span class="text-sm text-gray-600 dark:text-gray-400">익명 사용자</span>
+              <%= link_to "로그인", login_path,
+                  class: "inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900 hover:bg-primary-100 dark:hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-800 rounded-lg transition-colors" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- 메시지 입력 폼 -->
-  <div id="message-form">
-    <%= render "messages/form", conversation: @conversation, message: Message.new %>
+  <!-- 메인 채팅 컨테이너 -->
+  <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8" data-controller="chat" data-chat-conversation-id-value="<%= @conversation.id %>">
+    <!-- 채팅 헤더 -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-chat border border-gray-200 dark:border-gray-700 mb-6 p-4 sm:p-6 animate-fade-in">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+        <div class="flex-1 min-w-0">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
+            <%= @conversation.title %>
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <span class="inline-flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+              </svg>
+              세션 만료: <%= time_ago_in_words(@conversation.expires_at) %> 후
+            </span>
+            <span class="hidden sm:inline text-gray-400 dark:text-gray-500 mx-2">•</span>
+            <span class="block sm:inline text-xs">
+              <%= @conversation.expires_at.strftime('%Y-%m-%d %H:%M') %>
+            </span>
+          </p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+          <%= button_to "세션 연장", extend_session_conversation_path(@conversation), 
+              method: :post, 
+              class: "inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-800 rounded-lg transition-colors",
+              title: "세션을 7일 연장합니다" %>
+          <%= button_to "대화 종료", conversation_path(@conversation), 
+              method: :delete, 
+              class: "inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-800 rounded-lg transition-colors",
+              confirm: "정말로 대화를 종료하시겠습니까?",
+              title: "대화를 완전히 삭제합니다" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메시지 영역 -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-chat border border-gray-200 dark:border-gray-700 mb-6 flex flex-col animate-slide-up">
+      <!-- 메시지 컨테이너 -->
+      <div class="flex-1 overflow-hidden">
+        <div class="h-96 sm:h-[32rem] lg:h-[36rem] overflow-y-auto p-4 sm:p-6 space-y-4" id="messages" data-chat-target="messages">
+          <% if @messages.any? %>
+            <% @messages.each do |message| %>
+              <%= render "messages/message", message: message %>
+            <% end %>
+          <% else %>
+            <div class="flex flex-col items-center justify-center h-full text-center py-12">
+              <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">대화를 시작해보세요</h3>
+              <p class="text-gray-500 dark:text-gray-400 max-w-sm">
+                규정에 대해 궁금한 것을 물어보세요. AI가 관련 규정을 찾아 정확한 답변을 제공합니다.
+              </p>
+            </div>
+          <% end %>
+          
+          <!-- 로딩 인디케이터 (Turbo Streams로 제어) -->
+          <div id="loadingIndicator" data-chat-target="loadingIndicator"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메시지 입력 폼 -->
+    <div id="message-form" class="sticky bottom-0 bg-gray-50 dark:bg-gray-900 pt-4">
+      <%= render "messages/form", conversation: @conversation, message: Message.new %>
+    </div>
   </div>
 </div>
 

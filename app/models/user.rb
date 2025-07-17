@@ -5,13 +5,18 @@ class User < ApplicationRecord
   
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, presence: true
-  validates :role, presence: true, inclusion: { in: %w[admin super_admin] }
+  validates :role, presence: true, inclusion: { in: %w[user admin super_admin] }
   validates :password, presence: true, length: { minimum: 8 }, if: :password_required?
   validates :password, confirmation: true, if: :password_required?
   
   scope :active, -> { where.not(role: nil) }
+  scope :users, -> { where(role: 'user') }
   scope :admins, -> { where(role: 'admin') }
   scope :super_admins, -> { where(role: 'super_admin') }
+  
+  def user?
+    role == 'user'
+  end
   
   def admin?
     role == 'admin'
