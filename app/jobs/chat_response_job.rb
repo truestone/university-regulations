@@ -12,6 +12,9 @@ class ChatResponseJob
     
     Rails.logger.info "Generating AI response for message #{user_message_id} (job: #{job_id})"
     
+    # 로딩 상태 브로드캐스트
+    broadcast_loading_state(conversation, true)
+    
     begin
       # 1. RAG 검색으로 관련 문서 찾기
       search_results = perform_rag_search(user_message.content)
@@ -34,6 +37,7 @@ class ChatResponseJob
       )
       
       # 4. 실시간 브로드캐스트 (Turbo Streams)
+      broadcast_loading_state(conversation, false)
       broadcast_ai_response(ai_message)
       
       Rails.logger.info "AI response generated successfully for message #{user_message_id}"
@@ -54,6 +58,7 @@ class ChatResponseJob
         }
       )
       
+      broadcast_loading_state(conversation, false)
       broadcast_ai_response(error_message)
       
       # 에러를 다시 발생시켜 Sidekiq 재시도 메커니즘 활용
@@ -171,5 +176,22 @@ class ChatResponseJob
       partial: "messages/form",
       locals: { conversation: conversation, message: Message.new }
     )
+  end
+  
+  def broadcast_loading_state(conversation, is_loading)
+    # 로딩 인디케이터 표시/숨김
+    if is_loading
+      Turbo::StreamsChannel.broadcast_update_to(
+        "conversation_#{conversation.id}",
+        target: "loadingIndicator",
+        partial: "messages/loading_indicator"
+      )
+    else
+      Turbo::StreamsChannel.broadcast_update_to(
+        "conversation_#{conversation.id}",
+        target: "loadingIndicator", 
+        html: ""
+      )
+    end
   end
 end

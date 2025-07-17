@@ -174,11 +174,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_170000) do
     t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["chapter_id", "number"], name: "index_regulations_on_chapter_id_and_number", unique: true
-    t.index ["chapter_id", "sort_order"], name: "index_regulations_on_chapter_id_and_sort_order"
     t.index ["chapter_id"], name: "index_regulations_on_chapter_id"
     t.index ["is_active", "chapter_id"], name: "index_regulations_on_active_chapter"
-    t.index ["regulation_code"], name: "index_regulations_on_regulation_code", unique: true
     t.index ["status", "chapter_id"], name: "index_regulations_on_status_chapter"
     t.index ["status"], name: "index_regulations_on_status"
   end
