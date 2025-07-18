@@ -17,7 +17,7 @@
             "description": "RSpec 실행을 위한 Docker 이미지 빌드 및 컨테이너 기동, 의존성 설치와 테스트 DB 세팅을 수행한다.",
             "dependencies": [],
             "details": "- docker-compose build && docker-compose up -d\n- docker-compose exec web bundle install\n- docker-compose exec web bundle exec rails db:setup RAILS_ENV=test\n- 필요한 환경 변수(.env.test) 설정 및 확인",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
