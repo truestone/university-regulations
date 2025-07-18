@@ -51,12 +51,25 @@ SimpleCov.start 'rails' do
 
   # Custom coverage tracking
   at_exit do
-    if SimpleCov.result.covered_percent < minimum_coverage
-      puts "\n❌ Coverage is below minimum threshold of #{minimum_coverage}%"
-      puts "Current coverage: #{SimpleCov.result.covered_percent.round(2)}%"
+    result = SimpleCov.result
+    coverage_percent = result.covered_percent
+    
+    # Get minimum coverage threshold (handle both numeric and hash formats)
+    minimum_threshold = case minimum_coverage
+                       when Numeric
+                         minimum_coverage
+                       when Hash
+                         minimum_coverage[:line] || 90
+                       else
+                         90
+                       end
+    
+    if coverage_percent < minimum_threshold
+      puts "\n❌ Coverage is below minimum threshold of #{minimum_threshold}%"
+      puts "Current coverage: #{coverage_percent.round(2)}%"
       exit(1) if ENV['FAIL_ON_LOW_COVERAGE'] == 'true'
     else
-      puts "\n✅ Coverage threshold met: #{SimpleCov.result.covered_percent.round(2)}%"
+      puts "\n✅ Coverage threshold met: #{coverage_percent.round(2)}%"
     end
   end
 end

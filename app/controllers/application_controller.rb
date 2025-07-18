@@ -19,6 +19,19 @@ class ApplicationController < ActionController::Base
     @current_user
   end
   helper_method :current_user
+
+  # 대화 세션 로딩 (Task 9.1)
+  def load_conversation
+    # 쿠키에서 세션 ID 가져오기 또는 새로 생성
+    session[:chat_session_id] ||= SecureRandom.uuid
+    
+    # 현재 활성 대화 찾기
+    @current_conversation = Conversation.active.find_by(session_id: session[:chat_session_id])
+    
+    # 대화가 없거나 만료된 경우 새로 생성하지 않고 nil로 유지
+    # 실제 대화 생성은 사용자가 메시지를 보낼 때 수행
+  end
+  helper_method :load_conversation
   
   # 로그인 여부 확인
   def user_signed_in?

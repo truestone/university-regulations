@@ -11,6 +11,7 @@ class Conversation < ApplicationRecord
   
   before_create :set_expires_at
   before_save :update_last_message_at, if: :will_save_change_to_updated_at?
+  after_create :set_initial_title
   
   def expired?
     expires_at <= Time.current
@@ -18,6 +19,15 @@ class Conversation < ApplicationRecord
   
   def active?
     !expired?
+  end
+  
+  # 첫 번째 사용자 메시지로 제목 업데이트 (Task 9 요구사항)
+  def update_title_from_first_message!
+    first_user_message = messages.user_messages.first
+    return unless first_user_message && title == "새 대화"
+    
+    new_title = TitleGeneratorService.generate_from_message(first_user_message.content)
+    update!(title: new_title) if new_title != title
   end
   
   private
@@ -28,6 +38,10 @@ class Conversation < ApplicationRecord
   
   def update_last_message_at
     self.last_message_at = Time.current if messages.any?
+  end
+  
+  def set_initial_title
+    self.title = "새 대화" if title.blank?
   end
   
   def expires_at_must_be_future

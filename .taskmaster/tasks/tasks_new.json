@@ -1,0 +1,205 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Docker 기반 개발 환경 구성",
+        "description": "macOS 호스트에서 Rails, PostgreSQL(pgvector), Redis가 포함된 완전한 Docker Compose 개발 환경 설정",
+        "details": "- docker-compose.yml 작성\n  - services: web(Ruby 3.3-alpine, Rails 8), db(postgres:16-alpine + pgvector), redis\n  - build-arg로 BUNDLE_WITHOUT=test,development 제거\n- ankane/pgvector 이미지 또는 Dockerfile에 `CREATE EXTENSION IF NOT EXISTS pgvector` 실행\n- .env 파일 및 환경 변수 템플릿 작성\n- VS Code devcontainer.json 제공\n- makefile 또는 bin/dev 스크립트로 `docker-compose up -d` 단축 명령",
+        "testStrategy": "1. `docker-compose up -d` 실행 후 `docker ps`로 3개 컨테이너 기동 확인\n2. `docker-compose exec web rails -v`로 Rails 8.0.x 출력 확인\n3. `docker-compose exec db psql -U postgres -c \"SELECT extname FROM pg_extension WHERE extname='pgvector';\"` 결과로 pgvector 존재 확인",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Rails 8 프로젝트 초기화 및 핵심 Gem 설정",
+        "description": "Rails 8 애플리케이션 생성 및 필수 Gem 설치",
+        "details": "- 컨테이너 내부에서 `rails new regulations --database=postgresql --skip-javascript` 실행\n- Gemfile 추가: pg, pgvector, redis, sidekiq, tailwindcss-rails, turbo-rails, ruby-openai, anthropic, googleauth, google-apis-aiplatform_v1, rails_admin, rack-session-redis\n- `bundle install`\n- `rails turbo:install` `rails tailwindcss:install`\n- config/application.rb 에 기본 TimeZone, i18n(\"ko\") 설정",
+        "testStrategy": "1. `bundle exec rails runner 'puts Rails.version'` 로 8.x 출력\n2. `rails about` 명령 성공\n3. Gem 로딩 오류 없는지 RSpec 0 테스트 통과",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "PostgreSQL + pgvector 초기화 및 연결 설정",
+        "description": "Rails 데이터베이스.yml과 초기화 스크립트를 통해 pgvector 확장 활성화",
+        "details": "- config/database.yml 에 host: db, username/password 환경변수 참조\n- db 초기화 후 `rails db:create`\n- `rails g migration enable_pgvector` 생성 후 `enable_extension :pgvector` 추가\n- `rails db:migrate` 실행하여 확장 적용",
+        "testStrategy": "1. `rails db:schema:dump` 에 `enable_extension \"pgvector\"` 포함 확인\n2. `Article.connection.execute('SELECT vector(1)')` 문이 오류 없이 실행",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Core 데이터 모델 및 마이그레이션 작성",
+        "description": "User, Edition, Chapter, Regulation, Article, Clause 등 핵심 테이블 스키마 구현",
+        "details": "- `rails g model` 명령으로 PRD 명세 필드 생성\n- 각 모델에 belongs_to/has_many 관계 정의\n- enum/status 상수화 (Regulation.status)\n- Article 모델에 `vector :embedding, limit:1536` 사용\n- 인덱스: editions(sort_order), articles(using: :ivfflat, opclass:vector_cosine_ops)\n- 모델 레벨 validation 추가",
+        "testStrategy": "1. `rails db:migrate` 성공\n2. `rails console` 에서 샘플 객체 생성 후 `Article.last.embedding.ndim == 1536` 확인\n3. RSpec 모델 테스트: presence validation, relation 확인",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "기본 시드 데이터 및 레이크 태스크",
+        "description": "개발 편의를 위한 최소 시드 및 데이터를 삽입하는 rake task 구현",
+        "details": "- db/seeds.rb 에 super_admin 계정, 예시 Edition/Chapter 생성\n- lib/tasks/seed_sample.rake 작성: `rails db:seed` 대체 세밀 제어\n- 비밀번호는 ENV[ADMIN_PASSWORD] 사용",
+        "testStrategy": "1. `rails db:seed` 실행 후 User.count == 1, Edition.count >=1 확인\n2. 로그인 가능한지 system test (Capybara)",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "관리자 인증 및 세션 관리 구현",
+        "description": "bcrypt 기반 자체 인증과 Redis 세션 스토어 설정",
+        "details": "- `has_secure_password` 추가, bcrypt gem 포함\n- sessions_controller 작성: new/create/destroy\n- Redis 세션: config/initializers/session_store.rb `Rails.application.config.session_store :redis_store, servers: ENV['REDIS_URL']`\n- 로그인 15분 비활성시 만료",
+        "testStrategy": "1. 로그인 성공/실패 단위 테스트\n2. 브라우저 두 번째 탭에서 세션 공유 확인\n3. Redis 키 TTL 확인",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "RailsAdmin 도입 및 기본 CRUD UI",
+        "description": "RailsAdmin Gem 설정 후 규정 계층 CRUD 인터페이스 구성",
+        "details": "- Gem 'rails_admin', route `/admin`\n- config/initializers/rails_admin.rb에서 모델별 field grouping\n- Navigation tree: Edition→Chapter→Regulation→Article→Clause\n- Access control: before_action admin?",
+        "testStrategy": "1. /admin 로그인 후 Edition 리스트 렌더링 확인\n2. Regulation 생성-> DB 반영 확인\n3. CSRF, strong params 검증",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "텍스트 파싱 규칙 및 PoC 스크립트",
+        "description": "기존 74,707줄 규정 텍스트를 Edition/Chapter/Regulation 구조로 분리하는 프로토타입",
+        "details": "- lib/parsers/text_parser.rb 작성\n- 정규식 패턴: /^(\\d)-(\\d+)-(\\d+)/ for code, /제\\d+조/ for article\n- 출력: JSON {edition,chapter,regulation,articles:[]}\n- 벤치마크로 1만줄 30초 내 파싱 목표",
+        "testStrategy": "1. RSpec으로 20개 샘플 라인 기대 JSON 비교\n2. 실패 라인 비율 <5%",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "AI 기반 구조화 파싱 통합",
+        "description": "OpenAI GPT-4를 이용하여 예외 패턴 보정 및 95% 정확도 달성",
+        "details": "- service `AiParsers::RegulationParser` 작성\n- 프롬프트: \"다음 규정 텍스트를 JSON 스키마로 변환하라 ...\"\n- Temperature 0.1, function calling 사용\n- 실패 시 fallback: rule-based parser 재시도",
+        "testStrategy": "1. 100개 무작위 샘플에 대해 수동 Gold 기준과 Jaccard 0.95 이상 비교\n2. 호출 비용 로깅",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "배치 데이터 임포트 및 무결성 검증",
+        "description": "Sidekiq Worker로 파싱 JSON을 DB에 삽입하는 트랜잭션 처리",
+        "details": "- `ImportRegulationsWorker` 작성: takes file path or S3 key\n- `ActiveRecord::Base.transaction` 내 bulk insert\n- Constraint 오류 시 dead letter queue 이동",
+        "testStrategy": "1. Sidekiq inline 모드로 RSpec 테스트: JSON 3개 파일 임포트 후 counts 일치\n2. 중복 코드 발생 시 unique violation 발생 테스트",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "임베딩 생성 및 저장 배치 작업",
+        "description": "Article 콘텐츠를 OpenAI text-embedding-3-small로 임베딩 후 pgvector 저장",
+        "details": "- `EmbeddingJob` Sidekiq 설정, batch_size = 100\n- 파라미터: article_id array\n- API 호출 후 `Article.update_all(embedding: vector, embedding_updated_at: Time.current)`\n- rate_limit : 3req/sec, Redis throttle",
+        "testStrategy": "1. 10개 Article 임베딩 후 embedding.nil? == false\n2. pgvector cosine self-similarity 1.0 검증\n3. 실패시 retry 5회",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "벡터 검색 API 및 랭킹 로직",
+        "description": "pgvector cosine 유사도 기반 검색 Endpoint 구현",
+        "details": "- Route: POST /api/search {query:\"\"}\n- Controller calls OpenAI embeddings for query\n- SQL: `ORDER BY embedding <=> query_vector LIMIT 5`\n- 랭킹 점수 = 1 - cosine_distance\n- Serialize: articles + score",
+        "testStrategy": "1. rspec request: 예시 질문 → 200, array length ≤5\n2. 동일 쿼리 2회 호출시 캐시 HIT 여부 확인",
+        "priority": "medium",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "채팅 UI 및 Hotwire Turbo 통합",
+        "description": "사용자 자연어 질문 입력과 실시간 답변 스트리밍 UI 구현",
+        "details": "- View: app/views/search/chat.html.erb\n- Stimulus controller for submit -> fetch('/api/search')\n- Turbo Stream to append assistant message chunk by chunk\n- Tailwind chat bubble 스타일",
+        "testStrategy": "1. Cypress e2e: 질문 입력 후 2초 내 답변 등장\n2. 모바일 viewport 375px 테스트 통과",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "대화 세션 및 Message 기록 기능",
+        "description": "Conversation, Message 모델 구현과 브라우저 세션 UUID 기반 저장",
+        "details": "- before_action set_conversation via session[:uuid] ||= SecureRandom.uuid\n- 7일 TTL: daily rake `cleanup:conversations`\n- Title 자동: 첫 user message 20자 요약",
+        "testStrategy": "1. Redis session 삭제 후 새 UUID 발급 확인\n2. 7일 지난 Conversation 을 cleanup task 실행 시 삭제 확인",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "임베딩 동기화 트리거 및 진행률 모니터링 UI",
+        "description": "규정 변경시 embedding 재생성 자동 큐잉 및 RailsAdmin 내 진행률 표시",
+        "details": "- after_commit on Article create/update -> EmbeddingJob.perform_async(id)\n- Progress stored in Redis hash: total, done\n- Admin Dashboard card with progress bar (Stimulus polling)",
+        "testStrategy": "1. Regulation 수정 → EmbeddingJob enqueued 확인\n2. Dashboard progress 0→100% 변화 시각적 확인\n3. 동시 2개 동기화 시 race condition 없는지 검증",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-17T06:41:50.678Z",
+      "updated": "2025-07-17T06:41:50.678Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

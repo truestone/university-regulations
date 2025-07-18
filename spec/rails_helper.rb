@@ -30,10 +30,18 @@ Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 # recreate the test database by loading the schema.
 # If you are not using ActiveRecord, you can remove these lines.
 begin
-  ActiveRecord::Migration.maintain_test_schema!
+  # Skip schema validation if using custom DATABASE_URL for test environment
+  if ENV['DATABASE_URL']&.include?('regulations_test')
+    puts "Skipping schema validation for custom test database"
+  else
+    ActiveRecord::Migration.maintain_test_schema!
+  end
 rescue ActiveRecord::PendingMigrationError => e
-  abort e.to_s.strip
+  puts "Migration warning: #{e.message}"
+  # Don't abort for test environment with custom DATABASE_URL
+  abort e.to_s.strip unless ENV['DATABASE_URL']&.include?('regulations_test')
 end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [

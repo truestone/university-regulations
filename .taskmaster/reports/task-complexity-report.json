@@ -1,70 +1,14 @@
 {
 	"meta": {
-		"generatedAt": "2025-07-06T13:18:52.449Z",
-		"tasksAnalyzed": 10,
-		"totalTasks": 10,
+		"generatedAt": "2025-07-17T07:02:40.305Z",
+		"tasksAnalyzed": 7,
+		"totalTasks": 7,
 		"analysisCount": 10,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
 		"usedResearch": false
 	},
 	"complexityAnalysis": [
-		{
-			"taskId": 1,
-			"taskTitle": "Docker 기반 Rails 8 프로젝트 초기화",
-			"complexityScore": 7,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Dockerfile 작성, docker-compose 서비스 정의, 베이스 이미지 패키지 설치, Rails 신규 프로젝트 생성 스크립트, CI 파이프라인 및 pre-commit 설정을 포함하여 세부 단계·담당자·산출물·테스트 기준을 목록화하십시오.",
-			"reasoning": "컨테이너, 데이터베이스, CI, 스크립트 등 다양한 기술요소를 통합해야 하므로 중간 이상 복잡도이며 6단계 정도로 분해하면 병렬 진행과 검증이 용이합니다."
-		},
-		{
-			"taskId": 2,
-			"taskTitle": "핵심 데이터 모델 & 마이그레이션 구축",
-			"complexityScore": 6,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "모델·마이그레이션 생성, 인덱스·확장 설정, association/validation 구현, 시드 데이터 작성, 테스트·CI 통합의 다섯 영역으로 세부 계획을 작성하십시오.",
-			"reasoning": "모델 수는 많지만 Rails 표준 절차를 따르므로 복잡도는 중간 수준이며 5개의 논리적 영역으로 나누면 관리가 수월합니다."
-		},
-		{
-			"taskId": 3,
-			"taskTitle": "관리자 인증 및 세션 관리",
-			"complexityScore": 5,
-			"recommendedSubtasks": 4,
-			"expansionPrompt": "유저 모델 비밀번호 해시, 세션 컨트롤러 구현, Redis 세션 스토어 설정, UI·테스트 작성의 네 단계로 세부 작업을 정의하십시오.",
-			"reasoning": "표준 인증 플로우이지만 Redis 통합이 추가되므로 평균 난이도이며 4단계로 충분히 세분화할 수 있습니다."
-		},
-		{
-			"taskId": 4,
-			"taskTitle": "기본 관리자 대시보드 및 규정 CRUD",
-			"complexityScore": 6,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Rails Admin 설치, 트리 뷰 네비게이션 설정, 폼 커스터마이즈, 액션텍스트 통합, 감사 로그 설정의 다섯 파트로 상세 계획을 작성하십시오.",
-			"reasoning": "외부 젬을 활용하지만 UI 커스터마이징과 로그 연동이 필요하므로 중간 난이도, 5단계 분할이 적절합니다."
-		},
-		{
-			"taskId": 5,
-			"taskTitle": "텍스트 파일 파싱 및 샘플 데이터 임포트",
-			"complexityScore": 8,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "파서 설계, 노멀라이저 구현, 트랜잭션 임포터 작성, 실패 로깅·재시도 처리, Sidekiq/ActionCable 진행률, 테스트 시나리오의 여섯 부분으로 세부 작업·산출물을 정의하십시오.",
-			"reasoning": "대용량 파일, 상태머신 파싱, 오류 롤백 등 복잡한 흐름을 다뤄야 하므로 높은 난이도이며 6개 세부 영역이 필요합니다."
-		},
-		{
-			"taskId": 6,
-			"taskTitle": "임베딩 생성 및 자동 동기화 시스템",
-			"complexityScore": 6,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Sidekiq 워커 구현, after_commit 훅 추가, 전체 재빌드 태스크, 모니터링 UI, 테스트/스텁 구성의 다섯 단계로 구체 계획을 작성하십시오.",
-			"reasoning": "외부 API 호출과 비동기 처리 조합으로 중간 이상 복잡도이며 5단계로 나누면 책임 범위가 명확해집니다."
-		},
-		{
-			"taskId": 7,
-			"taskTitle": "벡터 검색 API 및 RAG 답변 서비스",
-			"complexityScore": 7,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "질문 임베딩, pgvector 검색 쿼리, GPT-4 프롬프트 생성, 레이트리밋·캐시, API 테스트 스위트의 다섯 항목으로 세부 계획을 작성하십시오.",
-			"reasoning": "DB 검색과 OpenAI RAG 조합, 성능 튜닝, 보안 제어가 필요해 상위 중간 난이도이며 5단계 분할이 적절합니다."
-		},
 		{
 			"taskId": 8,
 			"taskTitle": "채팅형 검색 프론트엔드 구현",
@@ -88,6 +32,62 @@
 			"recommendedSubtasks": 5,
 			"expansionPrompt": "AiSetting CRUD, 키 암호화 로직, 래퍼/비용 계산, BudgetService 경고, 대시보드 시각화·테스트의 다섯 단계로 세부 계획을 작성하십시오.",
 			"reasoning": "보안·비용 계산·알림 통합이 필요하여 중간 난이도이며 5개 서브태스크로 나누면 구현과 검증이 명확해집니다."
+		},
+		{
+			"taskId": 1,
+			"taskTitle": "Execute Full Test Suite and Validation",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Docker 환경에서 전체 테스트 스위트를 실행하고 결과를 정리·보고하기 위한 세부 작업(환경 준비, RSpec 실행, 실패 케이스 로깅 및 원인 분석, 커버리지 보고, 성능 및 Brakeman 보안 검사, 최종 리포트 작성)을 5개의 구체적인 서브태스크로 분할해 주세요.",
+			"reasoning": "테스트 실행은 자동화되어 있지만 466개 사례 분석, 커버리지 계산, 성능·보안 검사까지 포함되어 중간 이상의 난이도가 요구됩니다."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "AI API Integration Status Check",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "OpenAI, Anthropic, Google API 키 검증과 연결 테스트, 임베딩 및 채팅 호출, 에러 핸들링 시나리오 테스트를 포함한 6개의 구체적 서브태스크로 나눠 주세요.",
+			"reasoning": "외부 AI 서비스 3종과의 연동, 레이트 리밋·폴백 처리 등 다양한 시나리오를 검증해야 하므로 높은 복잡도가 존재합니다."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Regulation Data Parsing and Import Verification",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "규제 데이터 파일 파싱, DB 적재, 임베딩 생성, 벡터 인덱스 빌드, 성능 및 메모리 최적화, 검증 리포트 작성을 포함해 7개의 서브태스크로 세분화해 주세요.",
+			"reasoning": "대용량 파일 처리, DB 연동, 임베딩/인덱스 생성 및 성능 최적화를 모두 다뤄야 하므로 복잡도가 높습니다."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Web Interface Functionality Verification",
+			"complexityScore": 5,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "관리자 로그인·대시보드, 임베딩 관리, 규제 검색, 대화 UI, 반응형·접근성 테스트를 포함한 5개의 서브태스크로 나눠 주세요.",
+			"reasoning": "기능 범위는 넓지만 UI 기능 검증 위주로 자동화 없이 수작업 테스트가 가능해 중간 정도의 난이도입니다."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Vector Search Performance Optimization",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "pgvector 검색 벤치마킹, 인덱스 파라미터 조정, 쿼리 플랜 분석, 캐싱 전략 구현, 배치 임베딩 최적화, 결과 리포트 작성을 포함한 6개의 서브태스크로 세분화해 주세요.",
+			"reasoning": "DB 인덱스·쿼리 튜닝과 애플리케이션 레이어 캐싱 등 여러 계층을 다뤄야 해 높은 기술적 난이도가 존재합니다."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Production Deployment Preparation",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Render 프로덕션 배포를 위해 환경 변수 설정, Docker 이미지 최적화, 마이그레이션 스크립트 준비, 모니터링·로깅 설정, 백업·복구 절차, 헬스체크 구현 등을 7개의 서브태스크로 분할해 주세요.",
+			"reasoning": "인프라 구성 요소가 다양하지만 표준화된 프로세스를 따라 진행 가능해 중간 수준의 복잡도입니다."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Documentation and User Guide Creation",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "사용자 가이드, 관리자 가이드, API 문서, 설치/배포 문서, 문제 해결 문서 작성과 리뷰를 포함해 6개의 서브태스크로 세분화해 주세요.",
+			"reasoning": "콘텐츠 작성 위주의 작업으로 기술적 난이도는 낮지만 범위가 넓어 체계적인 분할이 필요합니다."
 		}
 	]
 }
